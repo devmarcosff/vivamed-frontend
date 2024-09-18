@@ -15,7 +15,7 @@ export default function Consultation() {
   const token = Cookie.get('accessToken');
 
   const fetchData = async () => {
-    await axios.get('http://138.186.72.20:3000/consulta', {
+    await axios.get('https://138.186.72.20:3000/consulta', {
       headers: {
         Authorization: `Bearer ${token}`
       }

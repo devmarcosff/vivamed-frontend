@@ -17,7 +17,7 @@ export default function ListarCidadao() {
   const token = nookies.get(null, "accessToken")
 
   const fetchData = async () => {
-    await axios.get('http://138.186.72.20:3000/cidadao', {
+    await axios.get('https://138.186.72.20:3000/cidadao', {
       headers: {
         Authorization: `Bearer ${token}`
       }

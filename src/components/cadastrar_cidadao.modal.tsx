@@ -36,7 +36,7 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
       "password": "smsbj"
     }
 
-    await axios.post('http://138.186.72.20:3000/cidadao', cadastro, {
+    await axios.post('https://138.186.72.20:3000/cidadao', cadastro, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
