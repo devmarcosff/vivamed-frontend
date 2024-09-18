@@ -1,6 +1,6 @@
 import { CircleFadingPlus, Edit, Eye, Trash } from "lucide-react";
 
-export default function cadastrar_cidadao() {
+export default function Pacientes() {
   return (
     <>
       <div className="bg-white my-2 shadow-md rounded-md p-5 w-full h-full">

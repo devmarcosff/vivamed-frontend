@@ -18,7 +18,7 @@ interface CadastroCidadao {
   password: string
 }
 
-export default function cadastrar_consulta({ openModal, closeModal }: any) {
+export default function CadastrarConsulta({ openModal, closeModal }: any) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const token = Cookie.get('accessToken');
   const [consulta, setConsulta] = useState<any>()

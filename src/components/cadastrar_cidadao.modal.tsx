@@ -20,7 +20,7 @@ interface CadastroCidadao {
   password: string
 }
 
-export default function cadastrar_cidadao_modal({ openModal, closeModal }: any) {
+export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const token = nookies.get(null, "accessToken")
   const [isRegistro, setIsRegistro] = useState<any>()

@@ -8,7 +8,7 @@ import moment from 'moment';
 import 'moment/locale/pt';
 import { useEffect, useState } from "react";
 
-export default function consultation() {
+export default function Consultation() {
   const [cidadao, setCidadao] = useState<any>([])
   const [open, setOpen] = useState(false)
 
