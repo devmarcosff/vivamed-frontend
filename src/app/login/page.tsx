@@ -31,7 +31,7 @@ export default function Login() {
 
   const onSubmit: SubmitHandler<Inputs> = ({ username, password }) => {
     // // AUTENTICAÇÃO DE USUÁRIO *TROCAR A URL DA .ENV*
-    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
+    axios.post(`http://138.186.72.20:3000/auth`, {
       username: username,
       password: password
     }).then(res => {
