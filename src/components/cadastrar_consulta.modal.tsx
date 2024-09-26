@@ -32,7 +32,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
       "descricao": data.descricao
     }
 
-    await axios.post('https://138.186.72.20:3000/consulta', consulta, {
+    await axios.post('https://menezestech.com/consulta', consulta, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
