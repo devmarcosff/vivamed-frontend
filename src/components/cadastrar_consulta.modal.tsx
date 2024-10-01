@@ -173,7 +173,9 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
                               Cargo *
                             </label>
-                            <input {...register('role')} value={user.role} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            {user && (
+                              <input {...register('role')} value={user.role} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            )}
                             {
                               errors.role && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                             }
@@ -182,7 +184,9 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
                               Id. Profissional *
                             </label>
-                            <input {...register('idProf')} value={user.idProf} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            {user && (
+                              <input {...register('idProf')} value={user.idProf} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            )}
                             {
                               errors.idProf && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                             }
