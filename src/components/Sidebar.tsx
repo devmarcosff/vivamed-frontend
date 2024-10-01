@@ -20,7 +20,7 @@ interface CadastroCidadao {
 // SIDEBAR
 export function Sidebar({ children }: string | any) {
   const [expanded, setExpanded] = useState(Boolean)
-  const [user, setUser] = useState()
+  const [user, setUser] = useState<CadastroCidadao | undefined>()
   const token = Cookie.get('accessToken');
 
   useEffect(() => {

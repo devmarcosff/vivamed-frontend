@@ -20,7 +20,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
   const token = Cookie.get('accessToken');
   const [consulta, setConsulta] = useState<any>()
   const [cidadao, setCidadao] = useState<any>([])
-  const [user, setUser] = useState<any>()
+  const [user, setUser] = useState<CadastroCidadao | undefined>()
 
   const createCidadao = async (data: any) => {
 
