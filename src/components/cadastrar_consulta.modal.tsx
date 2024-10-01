@@ -18,9 +18,9 @@ interface CadastroCidadao {
 export default function CadastrarConsulta({ openModal, closeModal }: any) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const token = Cookie.get('accessToken');
-  const decodedToken = jwtDecode<CadastroCidadao>(`${token}`)
   const [consulta, setConsulta] = useState<any>()
   const [cidadao, setCidadao] = useState<any>([])
+  const [user, setUser] = useState<any>()
 
   const createCidadao = async (data: any) => {
 
@@ -49,6 +49,15 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
   }
 
   useEffect(() => {
+    // Verifica se está no lado do cliente
+    if (typeof window !== 'undefined') {
+      const token = Cookie.get('accessToken');
+      if (token) {
+        const decoded = jwtDecode<CadastroCidadao>(`${token}`)
+        setUser(decoded);
+      }
+    }
+
     fetchData()
   }, []);
 
@@ -153,7 +162,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
                               Responsável técnico *
                             </label>
-                            <input {...register('respTec',)} value={decodedToken.name} className={`${errors.respTec && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            <input {...register('respTec',)} value={user.name} className={`${errors.respTec && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
                             {
                               errors.respTec && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                             }
@@ -162,7 +171,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
                               Cargo *
                             </label>
-                            <input {...register('role')} value={decodedToken.role} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            <input {...register('role')} value={user.role} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
                             {
                               errors.role && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                             }
@@ -171,7 +180,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
                               Id. Profissional *
                             </label>
-                            <input {...register('idProf')} value={decodedToken.idProf} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            <input {...register('idProf')} value={user.idProf} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
                             {
                               errors.idProf && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                             }

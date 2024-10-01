@@ -46,7 +46,6 @@ export default function Login() {
         theme: "light",
       });
       setCookie(null, 'accessToken', res.data.access_token)
-      // jwtDecode(res.data.access_token)
       push('/')
     }).catch(err => {
       toast.error('Usuário ou senha inválidos.', {

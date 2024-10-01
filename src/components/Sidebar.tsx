@@ -4,7 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 import { BriefcaseMedical, ChevronDown, ChevronFirst, ChevronLast, ChevronUp, LayoutDashboard, Stethoscope, Users } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import logo from '../assets/vivamed.svg';
 import Dropdown from "./Dropdown";
 
@@ -20,8 +20,19 @@ interface CadastroCidadao {
 // SIDEBAR
 export function Sidebar({ children }: string | any) {
   const [expanded, setExpanded] = useState(Boolean)
+  const [user, setUser] = useState()
   const token = Cookie.get('accessToken');
-  const authUser = jwtDecode<CadastroCidadao>(`${token}`)
+
+  useEffect(() => {
+    // Verifica se está no lado do cliente
+    if (typeof window !== 'undefined') {
+      const token = Cookie.get('accessToken');
+      if (token) {
+        const decoded = jwtDecode<CadastroCidadao>(`${token}`)
+        setUser(decoded);
+      }
+    }
+  }, []);
 
   return (
     <aside className={`h-screen`} >
@@ -41,7 +52,7 @@ export function Sidebar({ children }: string | any) {
         </div>
         <SidebarContext.Provider value={{ expanded, setExpanded }}>
           <ul className={`flex-1 px-3 ${expanded ? 'py-5' : 'hidden md:block'}`}>{children}</ul>
-          <SidebarDropdown.Provider value={{ name: authUser.name, idEnf: authUser.role, expanded }}>
+          <SidebarDropdown.Provider value={{ name: user.name, idEnf: user.role, expanded }}>
             <div className={`border-t flex p-3 ${expanded ? '' : 'hidden md:block'}`}>
               <Dropdown />
             </div>
