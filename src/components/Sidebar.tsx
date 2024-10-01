@@ -52,11 +52,13 @@ export function Sidebar({ children }: string | any) {
         </div>
         <SidebarContext.Provider value={{ expanded, setExpanded }}>
           <ul className={`flex-1 px-3 ${expanded ? 'py-5' : 'hidden md:block'}`}>{children}</ul>
-          <SidebarDropdown.Provider value={{ name: user.name, idEnf: user.role, expanded }}>
-            <div className={`border-t flex p-3 ${expanded ? '' : 'hidden md:block'}`}>
-              <Dropdown />
-            </div>
-          </SidebarDropdown.Provider>
+          {user && (
+            <SidebarDropdown.Provider value={{ name: user?.name, idEnf: user.role, expanded }}>
+              <div className={`border-t flex p-3 ${expanded ? '' : 'hidden md:block'}`}>
+                <Dropdown />
+              </div>
+            </SidebarDropdown.Provider>
+          )}
         </SidebarContext.Provider>
 
       </nav>
