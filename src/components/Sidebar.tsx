@@ -1,5 +1,7 @@
 "use client"
-import { Boxes, ChevronDown, ChevronFirst, ChevronLast, ChevronUp, CirclePlus, LayoutDashboard, Settings, Stethoscope, Users } from 'lucide-react';
+import Cookie from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
+import { BriefcaseMedical, ChevronDown, ChevronFirst, ChevronLast, ChevronUp, LayoutDashboard, Stethoscope, Users } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
 import { createContext, useContext, useState } from "react";
@@ -9,9 +11,17 @@ import Dropdown from "./Dropdown";
 const SidebarContext = createContext<any>(true)
 export const SidebarDropdown = createContext<any>(null)
 
+interface CadastroCidadao {
+  name: string,
+  role: string,
+  idProf: string
+}
+
 // SIDEBAR
 export function Sidebar({ children }: string | any) {
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(Boolean)
+  const token = Cookie.get('accessToken');
+  const authUser = jwtDecode<CadastroCidadao>(`${token}`)
 
   return (
     <aside className={`h-screen`} >
@@ -23,13 +33,15 @@ export function Sidebar({ children }: string | any) {
             <Image src={logo} className={`w-8`} alt="" />
             <span className="font-semibold text-indigo-800">Vivamed</span>
           </div>
-          <button onClick={() => setExpanded(click => !click)} className="p-1.5 rounded-lg bg-gray-300 hover:bg-gray-200 transition-all">
+          <button
+            onClick={() => setExpanded(click => !click)}
+            className="p-1.5 rounded-lg bg-gray-300 hover:bg-gray-200 transition-all">
             {expanded ? <ChevronFirst /> : <ChevronLast />}
           </button>
         </div>
         <SidebarContext.Provider value={{ expanded, setExpanded }}>
           <ul className={`flex-1 px-3 ${expanded ? 'py-5' : 'hidden md:block'}`}>{children}</ul>
-          <SidebarDropdown.Provider value={{ name: 'Marcos Stevanini', idEnf: '1234', expanded }}>
+          <SidebarDropdown.Provider value={{ name: authUser.name, idEnf: authUser.role, expanded }}>
             <div className={`border-t flex p-3 ${expanded ? '' : 'hidden md:block'}`}>
               <Dropdown />
             </div>
@@ -96,18 +108,19 @@ export const SidebarTrue = () => {
       <SidebarItem icon={<LayoutDashboard size={20} />} text="Dashboard" url={'/'} />
       <SidebarItem icon={<Users size={20} />} text="Pacientes" url={'/cadastrar_cidadao'} />
       <SidebarItem icon={<Stethoscope size={20} />} text="Consultas" url={'/consultas'} />
-      <hr className="my-3" />
+      <SidebarItem icon={<BriefcaseMedical size={20} />} text="Colaboradores" url={'/colaboradores'} />
+      {/* <hr className="my-3" /> */}
       {/* <SidebarItem icon={<UserCircle size={20} />} text="Estatística" />
       <SidebarItem icon={<Package size={20} />} text="Estoque" /> */}
-      <SidebarItem icon={<Boxes size={20} />} text="Farmácia" subMenu>
+      {/* <SidebarItem icon={<Boxes size={20} />} text="Farmácia" subMenu>
         <div className="flex-col">
           <SidebarSubmenu name="Cadastrar medicamentos" url="/cadastrar_medicamento" icon={<CirclePlus size={20} />} />
           <SidebarSubmenu name="Listar medicamentos" url="/listar_medicamento" icon={<CirclePlus size={20} />} />
         </div>
-      </SidebarItem>
+      </SidebarItem> */}
       {/* <SidebarItem icon={<Receipt size={20} />} text="Pagamentos" /> */}
-      <hr className="my-3" />
-      <SidebarItem icon={<Settings size={20} />} text="Configuração" url={'/config'} />
+      {/* <hr className="my-3" />
+      <SidebarItem icon={<Settings size={20} />} text="Configuração" url={'/config'} /> */}
       {/* <SidebarItem icon={<LifeBuoy size={20} />} text="Ajuda" /> */}
     </Sidebar>
   )

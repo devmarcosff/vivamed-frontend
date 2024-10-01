@@ -4,24 +4,23 @@ import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/re
 import { UserPlusIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import Cookie from 'js-cookie';
-import { useState } from 'react';
+import { jwtDecode } from 'jwt-decode';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 
 interface CadastroCidadao {
-  prontuario: string,
   name: string,
-  cpf: string,
-  birthday: Date,
-  caps: boolean,
-  username: string,
-  password: string
+  role: string,
+  idProf: string
 }
 
 export default function CadastrarConsulta({ openModal, closeModal }: any) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const token = Cookie.get('accessToken');
+  const decodedToken = jwtDecode<CadastroCidadao>(`${token}`)
   const [consulta, setConsulta] = useState<any>()
+  const [cidadao, setCidadao] = useState<any>([])
 
   const createCidadao = async (data: any) => {
 
@@ -29,16 +28,29 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
       "prontuario": data.prontuario,
       "respTec": data.respTec,
       "role": data.role,
+      "idProf": data.idProf,
       "descricao": data.descricao
     }
 
-    await axios.post('https://menezestech.com/consulta', consulta, {
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/consulta`, consulta, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
     }).then(e => { e.data !== 'Cidadão já está cadastrado.' && setConsulta(consulta) }).catch(e => console.log(e))
   }
+
+  const fetchData = async () => {
+    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cidadao`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).then(e => setCidadao(e.data)).catch(e => console.log(e))
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, []);
 
   return (
     <Dialog open={openModal} onClose={closeModal} className="relative z-10">
@@ -88,11 +100,11 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                       <div>
                         <div className='bg-gray-100 my-10 p-10 flex justify-around items-center shadow-md rounded'>
                           <div className='bg-white rounded shadow-md p-5 text-gray-700'>
-                            <h2>Informações da consulta realizada:</h2>
+                            <h2 className='font-bold'>Informações da consulta realizada</h2>
                             <p>Prontuario: {consulta.prontuario}</p>
                             <p>Responsável Técnico: {consulta.respTec}</p>
                             <p>Função: {consulta.role}</p>
-                            <p>Descrição da consulta: </p>
+                            <p className='font-bold'>Descrição da consulta: </p>
                             <p className='truncate max-w-[300px]'>{consulta.descricao}</p>
                           </div>
                         </div>
@@ -125,29 +137,43 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                         <div className="flex flex-wrap -mx-3 my-3">
                           <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
-                              Prontuário / CNS *
+                              Paciente *
                             </label>
-                            <input {...register('prontuario', { required: 'Por favor preencha este campo' })} className={`${errors.prontuario && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" placeholder="29452021510025415" />
+                            <select {...register('prontuario')} name="prontuario" id="prontuario" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
+                              <option value="">Selecione um paciente</option>
+                              {
+                                cidadao.map((item: any, index: any) => <option value={item.prontuario} key={index}>{item.name}</option>)
+                              }
+                            </select>
                             {
-                              errors.prontuario && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                              errors.paciente && <p className="text-red-500 text-xs italic">Por favor selecione um paciente</p>
                             }
                           </div>
                           <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
                               Responsável técnico *
                             </label>
-                            <input {...register('respTec', { required: 'Por favor preencha este campo' })} className={`${errors.respTec && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" placeholder="Marcos Paulo Fernandes de Faria" />
+                            <input {...register('respTec',)} value={decodedToken.name} className={`${errors.respTec && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
                             {
                               errors.respTec && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                             }
                           </div>
-                          <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                          <div className="w-full md:w-1/6 px-3 mb-6 md:mb-0">
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
                               Cargo *
                             </label>
-                            <input {...register('role', { required: 'Por favor preencha este campo' })} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" placeholder="Marcos Paulo Fernandes de Faria" />
+                            <input {...register('role')} value={decodedToken.role} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
                             {
                               errors.role && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                            }
+                          </div>
+                          <div className="w-full md:w-1/6 px-3 mb-6 md:mb-0">
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
+                              Id. Profissional *
+                            </label>
+                            <input {...register('idProf')} value={decodedToken.idProf} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            {
+                              errors.idProf && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                             }
                           </div>
                         </div>
@@ -166,58 +192,8 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             </div>
                           </div>
                         </div>
-                        {/* <h2 className='font-bold'>Adicionar endereço</h2>
-                        <div className="flex flex-wrap -mx-3 my-3">
-                          <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
-                            <div>
-                              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-city">
-                                Logadouro
-                              </label>
-                              <input {...register('street', { required: 'Por favor preencha este campo' })} className={`${errors.street && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} id="grid-city" type="text" placeholder="Av. Gov. Roberto Silveira" />
-                              {
-                                errors.street && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                              }
-                            </div>
-                          </div>
-                          <div className="w-full md:w-2/4 px-3 mb-6 md:mb-0">
-                            <div className='flex gap-5'>
-                              <div>
-                                <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-city">
-                                  N°
-                                </label>
-                                <input {...register('numero', { required: 'Por favor preencha este campo' })} className={`appearance-none shadow-md block w-full max-w-[100px] bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"`} id="grid-city" type="text" placeholder="68" />
-                              </div>
-                              <div className='w-full'>
-                                <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-state">
-                                  Cidade / Destrito
-                                </label>
-                                <div className="relative">
-                                  <select {...register('city', { required: 'Por favor preencha este campo' })} className={`${errors.city && 'border-red-500'} block appearance-none shadow-md w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"`} id="grid-state">
-                                    <option>Bom Jesus do Itabapoana</option>
-                                    <option>Usina Santa Maria</option>
-                                  </select>
-                                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                                  </div>
-                                </div>
-                                {
-                                  errors.city && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                                }
-                              </div>
-                            </div>
-                          </div>
-                          <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
-                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
-                              Cep
-                            </label>
-                            <input {...register('cep', { required: 'Por favor preencha este campo' })} className={`${errors.cep && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"`} id="grid-zip" type="text" placeholder="28360000" />
-                            {
-                              errors.cep && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                            }
-                          </div>
-                        </div> */}
 
-                        <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <div className="border-t-[1px] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                           <button
                             type="submit"
                             className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"

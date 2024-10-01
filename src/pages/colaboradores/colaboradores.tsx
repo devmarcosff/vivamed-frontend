@@ -1,15 +1,15 @@
 "use client"
 
-import ModalCidadao from '@/components/cadastrar_cidadao.modal';
-import FormatCPF from '@/components/FormatCpf';
+import ModalColaborador from '@/components/cadastrar_colaborador.modal';
 import axios from "axios";
 import Cookie from 'js-cookie';
 import { CircleFadingPlus, Eye } from "lucide-react";
 import moment from 'moment';
 import 'moment/locale/pt';
+import Link from 'next/link';
 import { useEffect, useState } from "react";
 
-export default function ListarCidadao() {
+export default function ListaColaboradores() {
   const [cidadao, setCidadao] = useState<any>([])
   const [open, setOpen] = useState(false)
   const [senhaCidadao, setSenhaCidadao] = useState<number>()
@@ -17,7 +17,7 @@ export default function ListarCidadao() {
   const token = Cookie.get('accessToken');
 
   const fetchData = async () => {
-    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cidadao`, {
+    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -31,8 +31,8 @@ export default function ListarCidadao() {
   return (
     <>
       <div className="bg-white my-2 shadow-md rounded-md p-5 w-full max-h-full overflow-auto">
-        <div className="flex justify-between items-center w-full top-0 border-b-[1px] pb-3">
-          <h2>Pacientes cadastrados</h2>
+        <div className="flex justify-between items-center w-full border-b-[1px] pb-3">
+          <h2>Lista de colaboradores</h2>
 
           <button
             onClick={() => {
@@ -50,11 +50,9 @@ export default function ListarCidadao() {
             <table className="table-auto w-full">
               <thead>
                 <tr>
-                  <th>Prontuário / CNS</th>
                   <th>Nome</th>
-                  <th>Data de nascimento</th>
-                  <th>CPF</th>
-                  <th>CAPS</th>
+                  <th>Usuário</th>
+                  <th>Ultima ativação</th>
                   <th></th>
                 </tr>
               </thead>
@@ -64,15 +62,13 @@ export default function ListarCidadao() {
                     moment.locale('pt')
                     return (
                       <tr className="border-b border-slate-300" key={index}>
-                        <th className="text-center">{item.prontuario}</th>
-                        <td className="text-center max-w-44 truncate">{item.name}</td>
-                        <td className="text-center">{moment(item.birthday).format("MM/DD/YYYY")}</td>
-                        <td className="text-center">{FormatCPF(item.cpf)}</td>
-                        <td className="text-center">{item.caps == false ? 'Não' : 'Sim'}</td>
+                        <th className="text-center max-w-44 truncate">{item.name}</th>
+                        <td className="text-center">{item.username}</td>
+                        <td className="text-center">{item.active ? 'A menos de 8 horas' : '2 dias ou mais'}</td>
                         <td className="flex items-center justify-center gap-2 py-5">
-                          <button className="bg-blue-500 hover:bg-blue-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
+                          <Link href={`/colaborador/${item.cpf}`} className="bg-blue-500 hover:bg-blue-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
                             <Eye size={15} />
-                          </button>
+                          </Link>
                         </td>
                       </tr>
                     )
@@ -84,7 +80,7 @@ export default function ListarCidadao() {
         </div>
       </div>
 
-      <ModalCidadao openModal={open} closeModal={setOpen} senhaCidadao={senhaCidadao} />
+      <ModalColaborador openModal={open} closeModal={setOpen} senhaCidadao={senhaCidadao} />
     </>
   );
 }

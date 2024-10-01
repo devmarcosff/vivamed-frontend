@@ -7,6 +7,7 @@ import { CircleFadingPlus, Eye } from "lucide-react";
 import moment from 'moment';
 import 'moment/locale/pt';
 import { useEffect, useState } from "react";
+import './style.css';
 
 export default function Consultation() {
   const [cidadao, setCidadao] = useState<any>([])
@@ -15,7 +16,7 @@ export default function Consultation() {
   const token = Cookie.get('accessToken');
 
   const fetchData = async () => {
-    await axios.get('https://menezestech.com/consulta', {
+    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/consulta`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -24,13 +25,13 @@ export default function Consultation() {
 
   useEffect(() => {
     fetchData()
-  }, [open == false]);
+  }, [cidadao]);
 
   return (
     <>
-      <div className="bg-white my-2 shadow-md rounded-md p-5 w-full max-h-[700px] overflow-auto">
+      <div className="bg-white my-2 shadow-md rounded-md p-5 w-full max-h-full overflow-auto">
         <div className="flex justify-between items-center w-full top-0 border-b-[1px] pb-3">
-          <h2>Lista de consultas</h2>
+          <h2 className='font-bold'>Consultas realizadas</h2>
 
           <button
             onClick={() => {
@@ -47,14 +48,14 @@ export default function Consultation() {
             <table className="table-auto w-full">
               <thead>
                 <tr>
-                  <th>Prontuário / CNS</th>
+                  <th>Prontuário</th>
                   <th>Paciente</th>
                   <th>Resp. Técnico</th>
                   <th>Data da consulta</th>
                   <th></th>
                 </tr>
               </thead>
-              <tbody className='text-sm h-[100px]'>
+              <tbody className='text-sm'>
                 {
                   cidadao.map((item: any, index: any) => {
                     moment.locale('pt')

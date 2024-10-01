@@ -3,11 +3,10 @@
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import { UserPlusIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
-import moment from 'moment';
+import Cookie from 'js-cookie';
 import nookies from 'nookies';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import FormatCPF from './FormatCpf';
 
 
 interface CadastroCidadao {
@@ -18,15 +17,52 @@ interface CadastroCidadao {
   caps: boolean,
   username: string,
   password: string
+
+  // Address
+  street: string,
+  city: string,
+  num: string,
+  cep: string,
+  state: string
+}
+
+interface CadastrarEndereco {
 }
 
 export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const token = nookies.get(null, "accessToken")
   const [isRegistro, setIsRegistro] = useState<any>()
+  const [isAddress, setIsAddress] = useState<any>()
+
+  const createAddress = async (data: any) => {
+    try {
+      const token = Cookie.get('accessToken')
+      var address = {
+        "street": data.street,
+        "city": data.city,
+        "num": data.num,
+        "cep": data.cep,
+        "state": "RJ",
+        "userId": isRegistro.prontuario
+      }
+
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/address/cidadao`, address, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      }).then(e => {
+        setIsAddress('Usuário cadastrado com sucesso')
+        reset()
+        closeModal(false)
+      }).catch(e => console.log(e.message))
+    } catch (error) {
+      console.error('Erro ao criar endereço', error);
+    }
+  }
 
   const createCidadao = async (data: any) => {
-
     var cadastro = {
       "prontuario": data.prontuario,
       "name": data.name,
@@ -36,12 +72,15 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
       "password": "smsbj"
     }
 
-    await axios.post('https://menezestech.com/cidadao', cadastro, {
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/cidadao`, cadastro, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-    }).then(e => { e.data !== 'Cidadão já está cadastrado.' && setIsRegistro(cadastro) }).catch(e => console.log(e))
+    }).then(e => {
+      e.data !== console.log('Cidadão já está cadastrado.')
+      setIsRegistro(cadastro)
+    }).catch(e => console.log(e))
   }
 
   return (
@@ -60,7 +99,7 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
               <div className="flex flex-col">
 
                 {
-                  isRegistro ? (
+                  isAddress ? (
                     <div className='flex items-center gap-3'>
                       <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
                         <UserPlusIcon aria-hidden="true" className="h-6 w-6 text-green-600" />
@@ -75,7 +114,7 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
                         <UserPlusIcon aria-hidden="true" className="h-6 w-6 text-green-600" />
                       </div>
                       <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
-                        Novo Cadastro de Cidadão
+                        Novo cadastro de paciente
                       </DialogTitle>
                     </div>
                   )
@@ -83,59 +122,84 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                   {
                     isRegistro ? (
-                      <div>
-                        <div className='bg-gray-100 my-10 p-10 flex justify-around items-center shadow-md rounded'>
-                          <div className='bg-white rounded shadow-md p-5 text-gray-700'>
-                            <h2>Informações pessoais</h2>
-                            <p>Carteira Nacional de Saúde:</p>
-                            <p className='font-bold'>{isRegistro.prontuario}</p>
-                            <p>Nome Completo: </p>
-                            <p className='font-bold'>{isRegistro.name}</p>
-                            <p>CPF:  </p>
-                            <p className='font-bold'>{FormatCPF(isRegistro.cpf)}</p>
-                            <p>Data de nascimento: </p>
-                            <p className='font-bold'>{moment(isRegistro.birthday).format("MM/DD/YYYY")}</p>
+                      <form className="w-full mt-10" onSubmit={handleSubmit(createAddress)}>
+                        <h2 className='font-bold'>Adicionar endereço</h2>
+                        <div className="flex flex-wrap -mx-3 my-3">
+                          <div className="w-full md:w-2/4 px-3 mb-6 md:mb-0">
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-city">
+                              Logadouro
+                            </label>
+                            <input {...register('street', { required: 'Por favor preencha este campo' })} className={`${errors.street && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} id="grid-city" type="text" placeholder="Av. Gov. Roberto Silveira" />
+                            {
+                              errors.street && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                            }
                           </div>
-                          <div className='bg-white rounded shadow-md p-5'>
-                            <h2>Acesso Cidadão</h2>
-                            <p>Login: </p>
-                            <p className='font-bold'>{isRegistro.prontuario}</p>
-                            <p>Senha: </p>
-                            <p className='font-bold'>{isRegistro.password}</p>
+                          <div className="w-full md:w-2/4 px-3 mb-6 md:mb-0">
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-city">
+                              N°
+                            </label>
+                            <input {...register('num', { required: 'Por favor preencha este campo' })} className={`appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"`} id="grid-city" type="text" placeholder="100" />
+                          </div>
+                          <div className="w-full md:w-2/4 px-3 mb-6 md:mb-0">
+                            <div className='w-full'>
+                              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-state">
+                                Cidade / Destrito
+                              </label>
+                              <div className="relative">
+                                <select {...register('city', { required: 'Por favor preencha este campo' })} className={`${errors.city && 'border-red-500'} block appearance-none shadow-md w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"`} id="grid-state">
+                                  <option>Bom Jesus do Itabapoana</option>
+                                  <option>Usina Santa Maria</option>
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                                </div>
+                              </div>
+                              {
+                                errors.city && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                              }
+                            </div>
+                          </div>
+                          <div className="w-full md:w-2/4 px-3 mb-6 md:mb-0">
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
+                              Cep
+                            </label>
+                            <input {...register('cep', { required: 'Por favor preencha este campo' })} className={`${errors.cep && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"`} id="grid-zip" type="text" placeholder="28360000" />
+                            {
+                              errors.cep && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                            }
                           </div>
                         </div>
-                        <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+
+                        <div className="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                           <button
                             type="submit"
-                            onClick={() => {
-                              reset()
-                              setIsRegistro(!isRegistro)
-                            }}
                             className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
                           >
-                            Novo cadastro
+                            Cadastrar
                           </button>
                           <button
                             type="button"
                             onClick={() => {
-                              reset()
                               closeModal(false)
+                              setIsAddress('')
+                              setIsRegistro('')
+                              reset()
                             }}
                             className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                           >
-                            Sair
+                            Cancelar
                           </button>
                         </div>
-                      </div>
+                      </form>
                     ) : (
                       <form className="w-full mt-10" onSubmit={handleSubmit(createCidadao)}>
                         <h2 className='font-bold'>Informações pessoais</h2>
                         <div className="flex flex-wrap -mx-3 my-3">
                           <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
-                              Prontuário / CNS *
+                              Prontuário *
                             </label>
-                            <input {...register('prontuario', { required: 'Por favor preencha este campo' })} className={`${errors.prontuario && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" placeholder="29452021510025415" />
+                            <input {...register('prontuario', { required: 'Por favor preencha este campo' })} className={`${errors.prontuario && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" placeholder="Informe o prontuário do paciente" />
                             {
                               errors.prontuario && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                             }
@@ -144,7 +208,7 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
                               Nome completo *
                             </label>
-                            <input {...register('name', { required: 'Por favor preencha este campo' })} className={`${errors.name && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" placeholder="Marcos Paulo Fernandes de Faria" />
+                            <input {...register('name', { required: 'Por favor preencha este campo' })} className={`${errors.name && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" placeholder="Informe o nome do paciente" />
                             {
                               errors.name && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                             }
@@ -173,62 +237,11 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold" htmlFor="caps">
                               Usuário do CAPS?
                             </label>
-                            <input {...register('caps')} type='checkbox' name='caps' id='caps' />
+                            <input {...register('caps')} type='checkbox' defaultChecked name='caps' id='caps' />
                           </div>
                         </div>
 
-                        {/* <h2 className='font-bold'>Adicionar endereço</h2>
-                        <div className="flex flex-wrap -mx-3 my-3">
-                          <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
-                            <div>
-                              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-city">
-                                Logadouro
-                              </label>
-                              <input {...register('street', { required: 'Por favor preencha este campo' })} className={`${errors.street && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} id="grid-city" type="text" placeholder="Av. Gov. Roberto Silveira" />
-                              {
-                                errors.street && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                              }
-                            </div>
-                          </div>
-                          <div className="w-full md:w-2/4 px-3 mb-6 md:mb-0">
-                            <div className='flex gap-5'>
-                              <div>
-                                <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-city">
-                                  N°
-                                </label>
-                                <input {...register('numero', { required: 'Por favor preencha este campo' })} className={`appearance-none shadow-md block w-full max-w-[100px] bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"`} id="grid-city" type="text" placeholder="68" />
-                              </div>
-                              <div className='w-full'>
-                                <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-state">
-                                  Cidade / Destrito
-                                </label>
-                                <div className="relative">
-                                  <select {...register('city', { required: 'Por favor preencha este campo' })} className={`${errors.city && 'border-red-500'} block appearance-none shadow-md w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"`} id="grid-state">
-                                    <option>Bom Jesus do Itabapoana</option>
-                                    <option>Usina Santa Maria</option>
-                                  </select>
-                                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                                  </div>
-                                </div>
-                                {
-                                  errors.city && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                                }
-                              </div>
-                            </div>
-                          </div>
-                          <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
-                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-zip">
-                              Cep
-                            </label>
-                            <input {...register('cep', { required: 'Por favor preencha este campo' })} className={`${errors.cep && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"`} id="grid-zip" type="text" placeholder="28360000" />
-                            {
-                              errors.cep && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                            }
-                          </div>
-                        </div> */}
-
-                        <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <div className="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                           <button
                             type="submit"
                             className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"

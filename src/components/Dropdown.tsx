@@ -15,10 +15,10 @@ export default function Dropdown() {
 
       <MenuButton className={`inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white ${expanded ? 'px-3  py-2' : 'px-0'} text-sm font-semibold text-gray-900 hover:bg-indigo-100 transition-all`}>
         <div className={`flex gap-3 justify-between items-center overflow-hidden transition-all`}>
-          <img src="https://ui-avatars.com/api/?name=Marcos+Stevanini&background=c7d2fe&color=3730a3&bold=true" className="w-10 h-10 rounded-md" alt="" />
+          <img src={`https://ui-avatars.com/api/?name=${name}&background=c7d2fe&color=3730a3&bold=true`} className="w-10 h-10 rounded-md" alt="" />
           <div>
-            <h4 className="font-semibold">{name}</h4>
-            <span className="text-xs text-gray-600">id: {idEnf}</span>
+            <h4 className="font-semibold capitalize">{name}</h4>
+            <span className="text-xs text-gray-600 capitalize">id: {idEnf}</span>
           </div>
           <ChevronUpIcon aria-hidden="true" className="h-5 w-5 text-gray-400" />
         </div>
