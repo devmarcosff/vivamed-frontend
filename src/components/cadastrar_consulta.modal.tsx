@@ -162,7 +162,9 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
                               Responsável técnico *
                             </label>
-                            <input {...register('respTec',)} value={user.name} className={`${errors.respTec && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            {user && (
+                              <input {...register('respTec',)} value={user.name} className={`${errors.respTec && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            )}
                             {
                               errors.respTec && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                             }
