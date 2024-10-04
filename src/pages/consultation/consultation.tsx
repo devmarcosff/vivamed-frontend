@@ -6,14 +6,19 @@ import Cookie from 'js-cookie';
 import { CircleFadingPlus, Eye } from "lucide-react";
 import moment from 'moment';
 import 'moment/locale/pt';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 import './style.css';
 
 export default function Consultation() {
+  const router = useRouter();
   const [cidadao, setCidadao] = useState<any>([])
   const [open, setOpen] = useState(false)
+  const token = Cookie.get('accessToken')
 
-  const token = Cookie.get('accessToken');
+  const handleNavigate = (id: any) => {
+    router.push(`/consultas/${id}`);
+  };
 
   const fetchData = async () => {
     await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/consulta`, {
@@ -66,7 +71,7 @@ export default function Consultation() {
                         <td className="text-center max-w-44 truncate">{item.respTec}</td>
                         <td className="text-center max-w-44 truncate">{moment(item.createAt).format("DD/MM/YYYY - HH:mm")}</td>
                         <td className="flex items-center justify-center gap-2 py-5">
-                          <button className="bg-blue-500 hover:bg-blue-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
+                          <button onClick={() => handleNavigate(item.id)} className="bg-blue-500 hover:bg-blue-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
                             <Eye size={15} />
                           </button>
                         </td>
