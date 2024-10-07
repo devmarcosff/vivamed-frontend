@@ -49,21 +49,22 @@ const ItemPage = ({ params }: any) => {
       </svg>
     );
   }
-  const fetchData = async () => {
-    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/consulta/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }).then(e => {
-      setCidadao(e.data)
-      setConsulta(e.data.descricao)
-      setMedicamentos(e.data.medicamentos)
-    }).catch(e => console.log(e))
-  }
 
   useEffect(() => {
+    const fetchData = async () => {
+      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/consulta/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }).then(e => {
+        setCidadao(e.data)
+        setConsulta(e.data.descricao)
+        setMedicamentos(e.data.medicamentos)
+      }).catch(e => console.log(e))
+    }
+
     fetchData()
-  }, [fetchData])
+  }, [])
 
   return (
     <div className="flex">
