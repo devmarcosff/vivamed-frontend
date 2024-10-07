@@ -108,17 +108,15 @@ const ItemPage = ({ params }: any) => {
             medicamentos.length == 0 ? '' : (
               <div className="bg-gray-100 p-5 mt-5 rounded-md shadow">
                 <h2 className="font-semibold">Medicamentos:</h2>
-                {medicamentos.map((item: any) => (
-                  <div key={item.id} className="bg-white my-3 rounded-md px-5 shadow-md relative z-0">
-                    <Accordion open={open === item.id} icon={<Icon id={item.id} open={open} />}>
-                      <AccordionHeader onClick={() => handleOpen(item.id)} className="text-sm font-semibold border-none">{item.prescricao}</AccordionHeader>
-                      <AccordionBody>
-                        <p><span className="font-semibold">Nome:</span> {item.prescricao}</p>
-                        <p><span className="font-semibold">Quantidade:</span> {item.quantidade}</p>
-                        <p><span className="font-semibold">Modo de uso:</span> {item.use || '12/12 horas - Uso oral'}</p>
-                      </AccordionBody>
-                    </Accordion>
-                  </div>
+                {medicamentos.map((item: any, index: any) => (
+                  <Accordion placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} key={index} className="bg-white my-3 rounded-md px-5 shadow-md relative z-0" open={open === item.id} icon={<Icon id={item.id} open={open} />}>
+                    <AccordionHeader placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} onClick={() => handleOpen(item.id)} className="text-sm font-semibold border-none">{item.prescricao}</AccordionHeader>
+                    <AccordionBody>
+                      <p><span className="font-semibold">Nome:</span> {item.prescricao}</p>
+                      <p><span className="font-semibold">Quantidade:</span> {item.quantidade}</p>
+                      <p><span className="font-semibold">Modo de uso:</span> {item.use || '12/12 horas - Uso oral'}</p>
+                    </AccordionBody>
+                  </Accordion>
                 ))}
               </div>
             )
