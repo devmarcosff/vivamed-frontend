@@ -63,7 +63,7 @@ const ItemPage = ({ params }: any) => {
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [fetchData])
 
   return (
     <div className="flex">
@@ -107,9 +107,9 @@ const ItemPage = ({ params }: any) => {
             medicamentos.length == 0 ? '' : (
               <div className="bg-gray-100 p-5 mt-5 rounded-md shadow">
                 <h2 className="font-semibold">Medicamentos:</h2>
-                {medicamentos.map((item: any, index: any) => (
+                {medicamentos.map((item: any) => (
                   <div className="bg-white my-3 rounded-md px-5 shadow-md relative z-0">
-                    <Accordion key={index} open={open === item.id} icon={<Icon id={item.id} open={open} />}>
+                    <Accordion key={item.id} open={open === item.id} icon={<Icon id={item.id} open={open} />}>
                       <AccordionHeader onClick={() => handleOpen(item.id)} className="text-sm font-semibold border-none">{item.prescricao}</AccordionHeader>
                       <AccordionBody>
                         <p><span className="font-semibold">Nome:</span> {item.prescricao}</p>
