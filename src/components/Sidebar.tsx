@@ -35,7 +35,7 @@ export function Sidebar({ children }: string | any) {
   }, []);
 
   return (
-    <aside className={`h-screen`} >
+    <aside className={`h-screen z-50`} >
       <nav className={`flex flex-col absolute transition-all duration-500 border-r shadow-sm bg-white md:h-full
           ${expanded ? 'h-full w-full md:relative md:w-64' : 'h-16 w-full md:relative md:w-[66px]'}
         `}>
