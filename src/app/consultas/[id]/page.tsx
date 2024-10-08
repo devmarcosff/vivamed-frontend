@@ -27,13 +27,10 @@ const ItemPage = ({ params }: any) => {
   const [cidadao, setCidadao] = useState<cidadao>()
   const [consulta, setConsulta] = useState('')
   const [medicamentos, setMedicamentos] = useState<any>([])
+  const [open, setOpen] = useState(0);
   const token = Cookie.get('accessToken')
 
-  const [open, setOpen] = useState(0);
-
   const handleOpen = (value: any) => setOpen(open === value ? 0 : value);
-
-  console.log(medicamentos.length)
 
   const Icon = ({ id, open }: any) => {
     return (
@@ -70,13 +67,6 @@ const ItemPage = ({ params }: any) => {
     <div className="flex">
       <SidebarTrue />
       <div className="w-full md:py-5 py-20 px-5 h-screen z-0">
-        {/* <div className="flex w-full gap-5 overflow-x-auto">
-          <div className="bg-white md:w-1/5 w-full p-5 rounded-md shadow-md">
-            <h2 className="font-semibold">Consulta realizada dia:</h2>
-            <span className="text-gray-500">{moment(cidadao?.createAt).format("DD/MM/YYYY - HH:mm")}</span>
-            <p className="font-thin text-sm text-gray-500">{cidadao?.id}</p>
-          </div>
-        </div> */}
         <div className="bg-white p-5 rounded-md shadow-md my-5">
           <div className="grid gap-5 grid-cols-2 md:grid-cols-4 md:text-center rounded-md md:gap-10 mb-5 md:bg-gray-100">
             <div className="md:m-5 p-2 bg-gray-100 md:bg-white rounded shadow-md">

@@ -65,8 +65,8 @@ export default function Consultation() {
                   cidadao.map((item: any, index: any) => {
                     moment.locale('pt')
                     return (
-                      <tr className="border-b border-slate-300" key={index}>
-                        <th className="text-center max-w-44 truncate">{item.prontuario}</th>
+                      <tr className="border-b border-slate-300 hover:bg-gray-300 hover:cursor-pointer" onClick={() => handleNavigate(item.id)} key={index}>
+                        <th className="text-center max-w-44 truncate underline cursor-pointer">{item.prontuario}</th>
                         <td className="text-center">{item.paciente}</td>
                         <td className="text-center max-w-44 truncate">{item.respTec}</td>
                         <td className="text-center max-w-44 truncate">{moment(item.createAt).format("DD/MM/YYYY - HH:mm")}</td>
