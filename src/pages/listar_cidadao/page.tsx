@@ -50,7 +50,7 @@ export default function ListarCidadao() {
             <table className="table-auto w-full">
               <thead>
                 <tr>
-                  <th>Prontuário / CNS</th>
+                  <th>Prontuário</th>
                   <th>Nome</th>
                   <th>Data de nascimento</th>
                   <th>CPF</th>

@@ -19,11 +19,32 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const token = Cookie.get('accessToken');
   const [consulta, setConsulta] = useState<any>()
+  const [medicamento, setMedicamento] = useState<any>(false)
   const [cidadao, setCidadao] = useState<any>([])
   const [user, setUser] = useState<CadastroCidadao | undefined>()
 
-  const createCidadao = async (data: any) => {
+  const createMedicamento = async (data: any) => {
+    var medicamentos = {
+      "prescricao": data.prescricao,
+      "quantidade": data.quantidade,
+      "use": data.use,
+      "cidadao": `${consulta}`
+    }
 
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/medicamentos`, medicamentos, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    }).then(() => {
+      setMedicamento(!medicamento)
+      setConsulta(!consulta)
+      reset()
+      closeModal(false)
+    }).catch(e => console.log(e))
+  }
+
+  const createCidadao = async (data: any) => {
     var consulta = {
       "prontuario": data.prontuario,
       "respTec": data.respTec,
@@ -37,18 +58,19 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-    }).then(e => { e.data !== 'Cidadão já está cadastrado.' && setConsulta(consulta) }).catch(e => console.log(e))
-  }
-
-  const fetchData = async () => {
-    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cidadao`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }).then(e => setCidadao(e.data)).catch(e => console.log(e))
+    }).then(e => {
+      setConsulta(e.data)
+    }).catch(e => console.log(e))
   }
 
   useEffect(() => {
+    const fetchData = async () => {
+      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cidadao`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }).then(e => setCidadao(e.data)).catch(e => console.log(e))
+    }
     // Verifica se está no lado do cliente
     if (typeof window !== 'undefined') {
       const token = Cookie.get('accessToken');
@@ -62,14 +84,14 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
   }, []);
 
   return (
-    <Dialog open={openModal} onClose={closeModal} className="relative z-10">
+    <Dialog open={openModal} onClose={closeModal} className="relative z-[100]">
       <DialogBackdrop
         transition
         className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
       />
 
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-        <div className="flex min-h-full justify-center p-4 text-center items-end sm:p-0">
+        <div className="flex min-h-full justify-center p-4 text-center items-center sm:p-0">
           <DialogPanel
             transition
             className={`relative transform overflow-hidden rounded-lg bg-white w-full text-left shadow-xl transition-all data-[closed]:translate-y-40 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full ${consulta ? 'sm:max-w-[40%]' : 'sm:max-w-[80%]'} data-[closed]:sm:translate-y-10 data-[closed]:sm:scale-95`}>
@@ -107,43 +129,107 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                   {
                     consulta ? (
                       <div>
-                        <div className='bg-gray-100 my-10 p-10 flex justify-around items-center shadow-md rounded'>
-                          <div className='bg-white rounded shadow-md p-5 text-gray-700'>
-                            <h2 className='font-bold'>Informações da consulta realizada</h2>
-                            <p>Prontuario: {consulta.prontuario}</p>
-                            <p>Responsável Técnico: {consulta.respTec}</p>
-                            <p>Função: {consulta.role}</p>
-                            <p className='font-bold'>Descrição da consulta: </p>
-                            <p className='truncate max-w-[300px]'>{consulta.descricao}</p>
-                          </div>
-                        </div>
-                        <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                          <button
-                            type="submit"
-                            onClick={() => {
-                              reset()
-                              setConsulta(!consulta)
-                            }}
-                            className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
-                          >
-                            Novo cadastro
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              reset()
-                              closeModal(false)
-                            }}
-                            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                          >
-                            Sair
-                          </button>
+                        <div>
+                          {
+                            medicamento ? (
+                              <form className="w-full" onSubmit={handleSubmit(createMedicamento)}>
+                                <h2 className='font-bold'>Adicionar medicamento</h2>
+                                <div className="flex flex-wrap -mx-3 my-3 bg-gray-50 p-10 shadow-md rounded">
+                                  <div className="w-full md:w-1/3 px-3 my-2">
+                                    <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prescricao">
+                                      Medicamento *
+                                    </label>
+                                    <select {...register('prescricao')} name="prescricao" id="prescricao" className={`shadow-md block w-full text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
+                                      <option value="">Selecione um medicamento</option>
+                                      <option value="dipirona">Dipirona</option>
+                                      <option value="rivotril">Rivotril</option>
+                                      <option value="alprazolam">Alprazolam</option>
+                                    </select>
+                                    {
+                                      errors.prescricao && <p className="text-red-500 text-xs italic">Por favor selecione um medicamento</p>
+                                    }
+                                  </div>
+                                  <div className="w-full md:w-1/3 px-3 my-2">
+                                    <div>
+                                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="quantidade">
+                                        Quantidade *
+                                      </label>
+                                      <input {...register('quantidade', { required: 'Por favor preencha este campo' })} type='text' placeholder='Quantidade' id="quantidade" name="quantidade" className={`${errors.quantidade && 'border-red-500'} appearance-none shadow-md block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} />
+                                      {
+                                        errors.quantidade && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                                      }
+                                    </div>
+                                  </div>
+                                  <div className="w-full md:w-1/3 px-3 my-2">
+                                    <div>
+                                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="use">
+                                        Tempo de uso
+                                      </label>
+                                      <input {...register('use')} placeholder='6/6 horas' id="use" name="use" className={`${errors.quantidade && 'border-red-500'} appearance-none shadow-md block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} />
+                                      {
+                                        errors.use && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                                      }
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                  <button
+                                    type="submit"
+                                    className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+                                  >
+                                    Adicionar medicamento
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      reset()
+                                      closeModal(false)
+                                    }}
+                                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                                  >
+                                    Sair
+                                  </button>
+                                </div>
+                              </form>
+                            ) : (
+                              <div className='bg-gray-50 p-10 shadow-md rounded text-center'>
+                                <div>
+                                  <h2>Consulta adicionada ao paciente.</h2>
+                                  <h2>Deseja adicionar medicamentos a consulta?</h2>
+                                </div>
+
+                                <div className="px-4 py-3 flex justify-center gap-3 sm:px-6">
+                                  <button
+                                    type="submit"
+                                    onClick={() => {
+                                      reset()
+                                      setMedicamento(true)
+                                    }}
+                                    className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+                                  >
+                                    SIM
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      reset()
+                                      setConsulta(!consulta)
+                                      closeModal(false)
+                                    }}
+                                    className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                                  >
+                                    NÃO
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                          }
                         </div>
                       </div>
                     ) : (
                       <form className="w-full" onSubmit={handleSubmit(createCidadao)}>
                         <h2 className='font-bold'>Informações pessoais</h2>
-                        <div className="flex flex-wrap -mx-3 my-3">
+                        <div className="flex flex-wrap -mx-3 my-3 text-left">
                           <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
                               Paciente *
@@ -193,8 +279,8 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                           </div>
                         </div>
                         <hr className='my-3' />
-                        <h2 className='font-bold'>Adicionar informações a consulta</h2>
-                        <div className="flex flex-wrap -mx-3 my-3">
+                        <h2 className='font-bold text-left'>Adicionar informações a consulta</h2>
+                        <div className="flex flex-wrap -mx-3 my-3 text-left">
                           <div className="w-full px-3 mb-6 md:mb-0">
                             <div>
                               <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-city">

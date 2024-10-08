@@ -1,6 +1,6 @@
 "use client"
 
-import ModalColaborador from '@/components/cadastrar_colaborador.modal';
+import ModalColaborador from '@/components/cadastrar_colaboradores.modal';
 import axios from "axios";
 import Cookie from 'js-cookie';
 import { CircleFadingPlus, Eye } from "lucide-react";
@@ -11,20 +11,19 @@ import { useEffect, useState } from "react";
 
 export default function ListaColaboradores() {
   const [cidadao, setCidadao] = useState<any>([])
+  const [senhaCidadao, setSenhaCidadao] = useState<any>([])
   const [open, setOpen] = useState(false)
-  const [senhaCidadao, setSenhaCidadao] = useState<number>()
 
   const token = Cookie.get('accessToken');
 
-  const fetchData = async () => {
-    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }).then(e => setCidadao(e.data)).catch(e => console.log(e))
-  }
-
   useEffect(() => {
+    const fetchData = async () => {
+      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }).then(e => setCidadao(e.data)).catch(e => console.log(e))
+    }
     fetchData()
   }, [open == false]);
 
@@ -66,7 +65,7 @@ export default function ListaColaboradores() {
                         <td className="text-center">{item.username}</td>
                         <td className="text-center">{item.active ? 'A menos de 8 horas' : '2 dias ou mais'}</td>
                         <td className="flex items-center justify-center gap-2 py-5">
-                          <Link href={`/colaborador/${item.cpf}`} className="bg-blue-500 hover:bg-blue-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
+                          <Link href={`/colaboradores/${item.cpf}`} className="bg-blue-500 hover:bg-blue-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
                             <Eye size={15} />
                           </Link>
                         </td>

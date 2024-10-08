@@ -81,7 +81,7 @@ export default function Login() {
                 </label>
                 <div className="flex items-center w-full gap-3 text-slate-700 bg-white py-2 px-3 shadow appearance-none border rounded-lg">
                   <FaRegUser className="text-sm" />
-                  <input {...register("username", { required: true })} className="bg-transparent outline-none w-full text-sm text-slate-700" id="username" type="text" placeholder="admin@admin.com" />
+                  <input {...register("username", { required: true })} className="bg-transparent outline-none w-full text-slate-700" id="username" type="text" placeholder="admin@admin.com" />
                 </div>
                 {
                   errors.username && <p className="text-red-500 text-xs italic">Insira um email válido.</p>
@@ -93,16 +93,16 @@ export default function Login() {
                 </label>
                 <div className="flex items-center w-full gap-3 text-slate-700 bg-white py-2 px-3 shadow appearance-none border rounded-lg">
                   <MdLockOutline />
-                  <input {...register("password", { required: true })} className="bg-transparent outline-none w-full text-sm text-slate-700" id="password" type={isPassword ? 'password' : 'text'} placeholder="******" />
+                  <input {...register("password", { required: true })} className="bg-transparent outline-none w-full text-slate-700" id="password" type={isPassword ? 'password' : 'text'} placeholder='******' />
                   {
-                    isPassword ? <IoMdEye className="cursor-pointer text-lg text-slate-500" onClick={() => setIsPassword(!isPassword)} /> : <IoMdEyeOff className="cursor-pointer text-lg text-slate-500" onClick={() => setIsPassword(!isPassword)} />
+                    isPassword ? <IoMdEye className="cursor-pointer text-slate-500" onClick={() => setIsPassword(!isPassword)} /> : <IoMdEyeOff className="cursor-pointer text-slate-500" onClick={() => setIsPassword(!isPassword)} />
                   }
                 </div>
                 {
-                  errors.password && <p className="text-red-500 text-xs italic">Insira uma senha válido.</p>
+                  errors.password && <p className="text-red-500 text-xs italic">Insira uma senha válida.</p>
                 }
               </div>
-              <div className="items-center gap-2 flex md:hidden justify-end mb-3">
+              {/* <div className="items-center gap-2 flex md:hidden justify-end mb-3">
                 <span className="text-slate-700 text-xs font-light">Novo por aqui?</span>
                 <button className="rounded-lg text-sm text-[#6d68d7] font-semibold">
                   Registrar
@@ -113,7 +113,7 @@ export default function Login() {
                 <button className="text-sm text-[#6d68d7] hover:text-[#6d68d7]/80 font-semibold border-[#6d68d7] transition-all">
                   Registrar
                 </button>
-              </div>
+              </div> */}
               <div className="flex items-center justify-between">
                 <button className="w-full p-2 rounded-lg text-sm bg-[#6d68d7] text-white font-semibold border border-slate-300 shadow-xl hover:shadow-none hover:translate-y-0.5 hover:bg-[#6d68d7]/80 transition-all" type="submit">
                   Acessar conta
