@@ -122,9 +122,9 @@ export default function Login() {
             </form>
           </div>
 
-          <div className="flex justify-center">
+          {/* <div className="flex justify-center">
             <span className="text-slate-500 text-sm">&copy;2024 Stevanini Design Studio</span>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="hidden md:flex w-full">
