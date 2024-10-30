@@ -5,16 +5,14 @@ import {
   CheckBadgeIcon,
   NumberedListIcon
 } from "@heroicons/react/24/solid";
-import {
-  Tab,
-  TabPanel,
-  Tabs,
-  TabsBody,
-  TabsHeader
-} from "@material-tailwind/react";
-import nookies from 'nookies';
-import { useState } from 'react';
+import axios from 'axios';
+import clsx from "clsx";
+import Cookie from 'js-cookie';
+import moment from 'moment';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import InputMask from 'react-input-mask';
+import { toast } from 'react-toastify';
 
 interface CadastroCidadao {
   nome?: string,
@@ -44,97 +42,34 @@ interface CadastroCidadao {
   frequencia?: string,
   caps?: boolean,
   password?: string
-
-  // Address
-  street?: string,
-  city?: string,
-  num?: string,
-  cep?: string,
-  state?: string
 }
 
-// const createCidadao = async (data: CadastroCidadao) => {
-//   const token = nookies.get(null, "accessToken")
-
-//   var cadastro = {
-//     // "frequencia": data.frequencia || "NAO-INTENSIVO",
-//     "nome": data.nome,
-//     "nascimento": data.nascimento,
-//     "cpf": data.cpf,
-//     "mae": data.mae,
-//     "pai": data.pai,
-//     "conjuge": data.conjuge,
-//     "cor": data.cor,
-//     "genero": data.genero,
-//     "password": "smsbj"
-//   }
-
-//   await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/cidadao`, cadastro, {
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'Authorization': `Bearer ${token}`
-//     },
-//   }).then(e => {
-//     // setIsRegistro(cadastro)
-//     // reset()
-//     resetar
-//   }).catch(e => console.log(e))
-// }
-
 export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
-  const token = nookies.get(null, "accessToken")
-  const [isRegistro, setIsRegistro] = useState<any>()
-  const [isAddress, setIsAddress] = useState<any>()
   const [activeTab, setActiveTab] = useState('pessoal');
-
-  const [preRegistro, setPreRegistro] = useState<CadastroCidadao>()
+  const [dadosCadastrais, setDadosCadastrais] = useState<CadastroCidadao>()
 
   const data = [
     {
       label: "Detalhe Pessoal",
       value: "pessoal",
-      icon: NumberedListIcon
+      icon: NumberedListIcon,
+      component: DadosPessoais({ setDadosCadastrais, setActiveTab })
     },
     {
       label: "Detalhe Social",
       value: "social",
-      icon: NumberedListIcon
+      icon: NumberedListIcon,
+      component: DadosSociais({ setDadosCadastrais, setActiveTab })
     },
     {
-      label: "Finalização",
+      label: "Finalizar Cadastro",
       value: "final",
-      icon: CheckBadgeIcon
+      icon: CheckBadgeIcon,
+      component: Final({ dadosCadastrais, setDadosCadastrais, setActiveTab, closeModal })
     }
   ];
 
-  // const createAddress = async (data: any) => {
-  //   try {
-  //     const token = Cookie.get('accessToken')
-  //     var address = {
-  //       "street": data.street,
-  //       "city": data.city,
-  //       "num": data.num,
-  //       "cep": data.cep,
-  //       "state": "RJ",
-  //       "userId": isRegistro.prontuario
-  //     }
-
-  //     await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/address/cidadao`, address, {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': `Bearer ${token}`
-  //       },
-  //     }).then(e => {
-  //       closeModal(false)
-  //       setIsAddress('')
-  //       setIsRegistro('')
-  //       reset()
-  //     }).catch(e => console.log(e.message))
-  //   } catch (error) {
-  //     console.error('Erro ao criar endereço', error);
-  //   }
-  // }
+  console.log(dadosCadastrais)
 
   return (
     <Dialog open={openModal} onClose={closeModal} className="relative z-10">
@@ -147,40 +82,36 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
         <div className="flex min-h-full justify-center p-4 text-center items-center sm:p-0">
           <DialogPanel
             transition
-            className={`relative transform overflow-hidden rounded-lg bg-white min-h-[600px] w-full text-left shadow-xl transition-all data-[closed]:translate-y-40 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full ${isRegistro ? 'sm:max-w-[40%]' : 'sm:max-w-[80%]'} data-[closed]:sm:translate-y-10 data-[closed]:sm:scale-95`}>
+            className={`relative transform overflow-hidden rounded-lg bg-white min-h-[600px] w-full text-left shadow-xl transition-all data-[closed]:translate-y-40 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-[80%] data-[closed]:sm:translate-y-10 data-[closed]:sm:scale-95`}>
 
-            <Tabs value={activeTab} onChange={(e: any, newValue: any) => setActiveTab(newValue)}>
-              <TabsHeader className='shadow-md bg-cyan-800'>
+            <div className="gap-2">
+              <div className='shadow-md p-4 bg-cyan-800 flex gap-4 justify-around'>
                 {data.map(({ label, value, icon }) => (
-                  <Tab key={value} value={value} className='p-3'>
-                    <div className="flex items-center gap-3">
-                      {/* {React.createElement(icon, { className: "w-5 h-5" })} */}
-                      <span className='rounded-full border-2 shadow-md border-cyan-900 h-8 w-8 flex items-center justify-center'>
+                  <button key={value} className={
+                    clsx('p-4 px-8 rounded-lg',
+                      {
+                        'bg-white shadow-md': activeTab === value
+                      }
+                    )} onClick={() => {
+                      console.log({ value })
+                      setActiveTab(value)
+                    }}>
+                    <div className="flex items-center gap-1 relative">
+                      {React.createElement(icon, { className: "w-5 h-5" })}
+                      <b>{label}</b>
+                      <span className='rounded-full absolute top-[-10px] right-[-20px] border-2 shadow-md border-cyan-900 h-5 w-5 text-sm font-bold flex items-center justify-center'>
                         {
                           value == 'pessoal' ? 1 : value == 'social' ? 2 : 3
                         }
                       </span>
-                      <b>{label}</b>
                     </div>
-                  </Tab>
+                  </button>
                 ))}
-              </TabsHeader>
-              <TabsBody>
-                {data.map(({ value }) => (
-                  <TabPanel key={value} value={value}>
-                    {value == 'pessoal' && DadosPessoais({
-                      setPreRegistro,
-                      preRegistro
-                    })}
-                    {value == 'social' && DadosSociais({
-                      setPreRegistro,
-                      preRegistro
-                    })}
-                    {value == 'final' && Final()}
-                  </TabPanel>
-                ))}
-              </TabsBody>
-            </Tabs>
+              </div>
+              <div className="p-8">
+                {data?.find(item => item.value === activeTab)?.component ?? <div>Não existe informações disponíveis</div>}
+              </div>
+            </div>
 
           </DialogPanel>
         </div>
@@ -189,186 +120,219 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
   )
 }
 
-function DadosPessoais({ setPreRegistro }: any) {
+function DadosPessoais({ setDadosCadastrais, setActiveTab }: any) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
   const DadoPessoal = (data: any) => {
-    setPreRegistro(data)
+    setDadosCadastrais(data)
+    setActiveTab('social')
   }
 
-  return (
-    <form className="w-full" onSubmit={handleSubmit(DadoPessoal)}>
-      <h2 className='font-bold text-left'>Informações pessoais</h2>
-      <div className="flex flex-wrap -mx-3 my-3 text-left">
-        <div className="w-full md:w-1/2 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="nome">
-            Nome completo *
-          </label>
-          <input {...register('nome', { required: 'Por favor preencha este campo' })} className={`${errors.nome && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="nome" type="text" placeholder="Informe o nome do paciente" />
-          {
-            errors.nome && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-          }
-        </div>
-        <div className="w-full md:w-1/2 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="birthday">
-            Data de nascimento *
-          </label>
-          <input {...register('birthday', { required: 'Por favor preencha este campo' })} className={`${errors.birthday && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} id="birthday" type="date" />
-          {
-            errors.birthday && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-          }
-        </div>
-        <div className="w-full md:w-1/2 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="cpf">
-            CPF *
-          </label>
-          <input {...register('cpf', { required: 'Por favor preencha este campo' })} className={`${errors.cpf && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} id="cpf" type="text" placeholder="000.000.000.00" />
-          {
-            errors.cpf && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-          }
-        </div>
-        <div className="w-full md:w-1/2 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="mae">
-            Nome da mãe *
-          </label>
-          <input {...register('mae', { required: 'Por favor preencha este campo' })} className={`${errors.mae && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="mae" type="text" placeholder="Mãe do paciente" />
-          {
-            errors.mae && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-          }
-        </div>
-        <div className="w-full md:w-1/2 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="pai">
-            Nome do pai <span className='text-cyan-700 font-semibold text-[10px]'>(não é obrigatório)</span>
-          </label>
-          <input {...register('pai', { required: 'Por favor preencha este campo' })} className={`${errors.pai && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="pai" type="text" placeholder="Mãe do paciente" />
-          {
-            errors.pai && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-          }
-        </div>
-        <div className="w-full md:w-1/2 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="conjuge">
-            Conjuge *
-          </label>
-          <input {...register('conjuge', { required: 'Por favor preencha este campo' })} className={`${errors.conjuge && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="conjuge" type="text" placeholder="Mãe do paciente" />
-          {
-            errors.conjuge && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-          }
-        </div>
-      </div>
-      <div className="flex flex-wrap -mx-3 my-3 text-left">
-        <div className="w-full md:w-1/4 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="genero">
-            Gênero *
-          </label>
-          <select {...register('genero')} name="genero" id="genero" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
-            <option value="M">Masculino</option>
-            <option value="F">Feminino</option>
-            <option value="N">Gênero Neutro</option>
-            <option value="Outro">Outro</option>
-          </select>
-          {
-            errors.genero && <p className="text-red-500 text-xs italic">Por favor selecione um gênero</p>
-          }
-        </div>
-        <div className="w-full md:w-1/4 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="cor">
-            Raça/Cor *
-          </label>
-          <select {...register('cor')} name="cor" id="cor" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
-            <option value="branco">Branco</option>
-            <option value="preto">Preto</option>
-            <option value="pardo">Pardo</option>
-            <option value="amarelo">Amarelo</option>
-            <option value="indigena">Indígena</option>
-          </select>
-          {
-            errors.cor && <p className="text-red-500 text-xs italic">Por favor selecione uma cor</p>
-          }
-        </div>
-        <div className="w-full md:w-1/4 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="frequencia">
-            Frequencia do usuário *
-          </label>
-          <select {...register('frequencia')} name="frequencia" id="frequencia" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
-            <option value="INTENSIVO">INTENSIVO</option>
-            <option value="SEMI-INTENSIVO">SEMI-INTENSIVO</option>
-            <option value="NAO-INTENSIVO">NAO-INTENSIVO</option>
-          </select>
-          {
-            errors.frequencia && <p className="text-red-500 text-xs italic">Por favor selecione uma frequencia</p>
-          }
-        </div>
-        <div className="w-full md:w-1/4 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="caps">
-            Usuário do caps? *
-          </label>
-          <select {...register('caps')} name="caps" id="caps" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
-            <option value={`${true}`}>SIM</option>
-            <option value={`${false}`}>NÃO</option>
-          </select>
-          {
-            errors.caps && <p className="text-red-500 text-xs italic">Por favor preencha o campo caps</p>
-          }
-        </div>
-      </div>
 
-      <div className="border-t-[1px] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-        <button
-          type="submit"
-          className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
-        >
-          Avançar
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            reset()
-          }}
-          className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-        >
-          Limpar
-        </button>
-      </div>
-    </form>
+  return (
+    <div className='transition-all'>
+      <form className="w-full" onSubmit={handleSubmit(DadoPessoal)}>
+        <h2 className='font-bold text-left'>Informações pessoais</h2>
+        <div className="flex flex-wrap -mx-3 my-3 text-left">
+          <div className="w-full md:w-1/2 px-3 my-3">
+            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="nome">
+              Nome completo *
+            </label>
+            <input placeholder='Nome completo do paciente' {...register('nome', { required: 'Por favor preencha este campo' })} className={`${errors.nome && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="nome" type="text" />
+            {
+              errors.nome && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+            }
+          </div>
+          <div className="w-full md:w-1/2 px-3 my-3">
+            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="birthday">
+              Data de nascimento *
+            </label>
+            <input {...register('birthday', { required: 'Por favor preencha este campo' })} className={`${errors.birthday && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} id="birthday" type="date" />
+            {
+              errors.birthday && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+            }
+          </div>
+          <div className="w-full md:w-1/4 px-3 my-3">
+            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="cpf">
+              CPF *
+            </label>
+            <InputMask
+              mask="999.999.999-99"
+              {...register('cpf', { required: 'Por favor preencha este campo' })}
+            >
+              {(inputProps: any) => <input {...inputProps} type="text" placeholder="000.000.000-00" className={`${errors.cpf && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} id="cpf" />}
+            </InputMask>
+            {
+              errors.cpf && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+            }
+          </div>
+          <div className="w-full md:w-1/4 px-3 my-3">
+            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="telContato">
+              Telefone de contato *
+            </label>
+            <InputMask
+              mask="(99) 99999-9999"
+              {...register('telContato', { required: 'Por favor preencha este campo' })}
+            >
+              {(inputProps: any) => <input {...inputProps} placeholder='(22)99999-9999' type="tel" className={`${errors.telContato && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} id="telContato" />}
+            </InputMask>
+            {
+              errors.telContato && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+            }
+          </div>
+          <div className="w-full md:w-1/2 px-3 my-3">
+            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="mae">
+              Nome da mãe *
+            </label>
+            <input {...register('mae', { required: 'Por favor preencha este campo' })} className={`${errors.mae && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="mae" type="text" placeholder="Mãe do paciente" />
+            {
+              errors.mae && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+            }
+          </div>
+          <div className="w-full md:w-1/2 px-3 my-3">
+            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="pai">
+              Nome do pai <span className='text-cyan-700 font-semibold text-[10px]'>(não é obrigatório)</span>
+            </label>
+            <input {...register('pai')} className={`${errors.pai && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="pai" type="text" placeholder="Pai do paciente (opcional)" />
+            {
+              errors.pai && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+            }
+          </div>
+          <div className="w-full md:w-1/2 px-3 my-3">
+            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="conjuge">
+              Conjuge <span className='text-cyan-700 font-semibold text-[10px]'>(não é obrigatório)</span>
+            </label>
+            <input {...register('conjuge')} className={`${errors.conjuge && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="conjuge" type="text" placeholder="Conjuge do paciente (opcional)" />
+            {
+              errors.conjuge && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+            }
+          </div>
+        </div>
+        <div className="flex flex-wrap -mx-3 my-3 text-left">
+          <div className="w-full md:w-1/4 px-3 my-3">
+            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="genero">
+              Gênero *
+            </label>
+            <select {...register('genero')} name="genero" id="genero" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+              <option value="N">Gênero Neutro</option>
+              <option value="Outro">Outro</option>
+            </select>
+            {
+              errors.genero && <p className="text-red-500 text-xs italic">Por favor selecione um gênero</p>
+            }
+          </div>
+          <div className="w-full md:w-1/4 px-3 my-3">
+            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="cor">
+              Raça/Cor *
+            </label>
+            <select {...register('cor')} name="cor" id="cor" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
+              <option value="branco">Branco</option>
+              <option value="preto">Preto</option>
+              <option value="pardo">Pardo</option>
+              <option value="amarelo">Amarelo</option>
+              <option value="indigena">Indígena</option>
+            </select>
+            {
+              errors.cor && <p className="text-red-500 text-xs italic">Por favor selecione uma cor</p>
+            }
+          </div>
+          <div className="w-full md:w-1/4 px-3 my-3">
+            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="frequencia">
+              Frequencia do usuário *
+            </label>
+            <select {...register('frequencia')} name="frequencia" id="frequencia" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
+              <option value="INTENSIVO">INTENSIVO</option>
+              <option value="SEMI-INTENSIVO">SEMI-INTENSIVO</option>
+              <option value="NAO-INTENSIVO">NAO-INTENSIVO</option>
+            </select>
+            {
+              errors.frequencia && <p className="text-red-500 text-xs italic">Por favor selecione uma frequencia</p>
+            }
+          </div>
+          <div className="w-full md:w-1/4 px-3 my-3">
+            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="caps">
+              Usuário do caps? *
+            </label>
+            <select {...register('caps')} name="caps" id="caps" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
+              <option value={`${true}`}>SIM</option>
+              <option value={`${false}`}>NÃO</option>
+            </select>
+            {
+              errors.caps && <p className="text-red-500 text-xs italic">Por favor preencha o campo caps</p>
+            }
+          </div>
+        </div>
+
+        <div className="border-t-[1px] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button
+            type="submit"
+            className={`cursor-pointer bg-green-600 hover:bg-green-500 inline-flex w-full justify-center rounded-md  px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto`}
+          >
+            Avançar
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              reset()
+            }}
+            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+          >
+            Limpar
+          </button>
+        </div>
+      </form>
+    </div>
   )
 }
 
-function DadosSociais({ setPreRegistro }: any) {
+function DadosSociais({ setDadosCadastrais, setActiveTab }: any) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
   const DadosSocial = (data: any) => {
-    setPreRegistro({ ...data, data })
+    setDadosCadastrais((prevState: any) => ({ ...prevState, ...data }))
+    setActiveTab('final')
   }
 
   return (
-    <form className="w-full" onSubmit={handleSubmit(DadosSocial)}>
+    <form className="w-full transition-all" onSubmit={handleSubmit(DadosSocial)}>
       <h2 className='font-bold text-left'>Informações sociais</h2>
       <div className="flex flex-wrap -mx-3 my-3 text-left">
         <div className="w-full md:w-1/2 px-3 my-3">
           <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
             Prontuario *
           </label>
-          <input {...register('prontuario', { required: 'Por favor preencha este campo' })} className={`${errors.prontuario && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="prontuario" type="text" placeholder="Informe o nome do paciente" />
+          <input placeholder='N° de prontuário' {...register('prontuario', { required: 'Por favor preencha este campo' })} className={`${errors.prontuario && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="prontuario" type="text" />
           {
             errors.prontuario && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
           }
         </div>
         <div className="w-full md:w-1/2 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="tecResponsavel">
+            Responsável Técnico *
+          </label>
+          <input placeholder='Téc. do paciente'  {...register('tecResponsavel', { required: 'Por favor preencha este campo' })} className={`${errors.tecResponsavel && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="tecResponsavel" type="text" />
+          {
+            errors.tecResponsavel && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+          }
+        </div>
+        <div className="w-full md:w-1/4 px-3 my-3">
+          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="cns">
             cns *
           </label>
-          <input {...register('prontuario', { required: 'Por favor preencha este campo' })} className={`${errors.prontuario && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="prontuario" type="text" placeholder="Informe o nome do paciente" />
+          <input placeholder='CNS do paciente' {...register('cns', { required: 'Por favor preencha este campo' })} className={`${errors.cns && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="cns" type="text" />
           {
-            errors.prontuario && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+            errors.cns && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
           }
         </div>
-        <div className="w-full md:w-1/2 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+        <div className="w-full md:w-1/4 px-3 my-3">
+          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="cid">
             cid *
           </label>
-          <input {...register('prontuario', { required: 'Por favor preencha este campo' })} className={`${errors.prontuario && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="prontuario" type="text" placeholder="Informe o nome do paciente" />
+          <input placeholder='CID do paciente' {...register('cid', { required: 'Por favor preencha este campo' })} className={`${errors.cid && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="cid" type="text" />
           {
-            errors.prontuario && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+            errors.cid && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
           }
         </div>
         <div className="w-full md:w-1/2 px-3 my-3">
@@ -405,15 +369,15 @@ function DadosSociais({ setPreRegistro }: any) {
           }
         </div>
         <div className="w-full md:w-1/4 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="doenca">
-            Usa Medicacao? *
+          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="usaMedicacao">
+            Usa medicação? *
           </label>
-          <select {...register('doenca')} name="doenca" id="doenca" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
+          <select {...register('usaMedicacao')} name="usaMedicacao" id="usaMedicacao" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
             <option value="N">NÃO</option>
             <option value="S">SIM</option>
           </select>
           {
-            errors.doenca && <p className="text-red-500 text-xs italic">Por favor selecione este campo</p>
+            errors.medicacao && <p className="text-red-500 text-xs italic">Por favor selecione este campo</p>
           }
         </div>
         <div className="w-full md:w-1/4 px-3 my-3">
@@ -475,7 +439,7 @@ function DadosSociais({ setPreRegistro }: any) {
           <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="motivoAcolhimento">
             Motivo do Acolhimento *
           </label>
-          <textarea rows={4} {...register('motivoAcolhimento', { required: 'Por favor preencha este campo' })} className={`${errors.motivoAcolhimento && 'border-red-500'} resize-none appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="motivoAcolhimento" placeholder="Informe o nome do paciente" />
+          <textarea placeholder='Se houver motivo de acolhimento, informe-o aqui:' rows={4} {...register('motivoAcolhimento', { required: 'Por favor preencha este campo' })} className={`${errors.motivoAcolhimento && 'border-red-500'} resize-none appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="motivoAcolhimento" />
           {
             errors.motivoAcolhimento && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
           }
@@ -485,7 +449,7 @@ function DadosSociais({ setPreRegistro }: any) {
           <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="servicoEncaminhado">
             Servico Encaminhado *
           </label>
-          <textarea rows={4} {...register('servicoEncaminhado', { required: 'Por favor preencha este campo' })} className={`${errors.servicoEncaminhado && 'border-red-500'} resize-none appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="servicoEncaminhado" placeholder="Informe o nome do paciente" />
+          <textarea placeholder='Se houver serviço encaminhado, informe-o aqui:' rows={4} {...register('servicoEncaminhado', { required: 'Por favor preencha este campo' })} className={`${errors.servicoEncaminhado && 'border-red-500'} resize-none appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="servicoEncaminhado" />
           {
             errors.servicoEncaminhado && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
           }
@@ -495,68 +459,12 @@ function DadosSociais({ setPreRegistro }: any) {
           <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="condutaImediata">
             Conduta Imediata *
           </label>
-          <textarea rows={4} {...register('condutaImediata', { required: 'Por favor preencha este campo' })} className={`${errors.condutaImediata && 'border-red-500'} resize-none appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="condutaImediata" placeholder="Informe o nome do paciente" />
+          <textarea placeholder='Se houver conduta imediata, informe-o aqui:' rows={4} {...register('condutaImediata', { required: 'Por favor preencha este campo' })} className={`${errors.condutaImediata && 'border-red-500'} resize-none appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="condutaImediata" />
           {
             errors.condutaImediata && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
           }
         </div>
       </div>
-      {/* <div className="flex flex-wrap -mx-3 my-3 text-left">
-        <div className="w-full md:w-1/4 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="genero">
-            Gênero *
-          </label>
-          <select {...register('genero')} name="genero" id="genero" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
-            <option value="M">Masculino</option>
-            <option value="F">Feminino</option>
-            <option value="N">Gênero Neutro</option>
-            <option value="Outro">Outro</option>
-          </select>
-          {
-            errors.genero && <p className="text-red-500 text-xs italic">Por favor selecione um gênero</p>
-          }
-        </div>
-        <div className="w-full md:w-1/4 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="cor">
-            Raça/Cor *
-          </label>
-          <select {...register('cor')} name="cor" id="cor" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
-            <option value="branco">Branco</option>
-            <option value="preto">Preto</option>
-            <option value="pardo">Pardo</option>
-            <option value="amarelo">Amarelo</option>
-            <option value="indigena">Indígena</option>
-          </select>
-          {
-            errors.cor && <p className="text-red-500 text-xs italic">Por favor selecione uma cor</p>
-          }
-        </div>
-        <div className="w-full md:w-1/4 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="frequencia">
-            Frequencia do usuário *
-          </label>
-          <select {...register('frequencia')} name="frequencia" id="frequencia" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
-            <option value="INTENSIVO">INTENSIVO</option>
-            <option value="SEMI-INTENSIVO">SEMI-INTENSIVO</option>
-            <option value="NAO-INTENSIVO">NAO-INTENSIVO</option>
-          </select>
-          {
-            errors.frequencia && <p className="text-red-500 text-xs italic">Por favor selecione uma frequencia</p>
-          }
-        </div>
-        <div className="w-full md:w-1/4 px-3 my-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="caps">
-            Usuário do caps? *
-          </label>
-          <select {...register('caps')} name="caps" id="caps" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
-            <option value={`${true}`}>SIM</option>
-            <option value={`${false}`}>NÃO</option>
-          </select>
-          {
-            errors.caps && <p className="text-red-500 text-xs italic">Por favor preencha o campo caps</p>
-          }
-        </div>
-      </div> */}
 
       <div className="border-t-[1px] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
         <button
@@ -579,10 +487,239 @@ function DadosSociais({ setPreRegistro }: any) {
   )
 }
 
-function Final() {
+function Final({ dadosCadastrais, setDadosCadastrais, setActiveTab, closeModal }: any) {
+  const phoneMask = (value: any) => {
+    if (!value) return ""
+    value = value.replace(/\D/g, '')
+    value = value.replace(/(\d{2})(\d)/, "($1) $2")
+    value = value.replace(/(\d)(\d{4})$/, "$1-$2")
+    return value
+  }
+
+  const finalizarCadastro = async () => {
+    const token = Cookie.get('accessToken')
+    var cadastro = {
+      "nome": dadosCadastrais.nome,
+      "nascimento": dadosCadastrais.birthday,
+      "cpf": dadosCadastrais.cpf,
+      "mae": dadosCadastrais.mae,
+      "pai": dadosCadastrais.pai,
+      "conjuge": dadosCadastrais.conjuge,
+      "genero": dadosCadastrais.genero,
+      "cor": dadosCadastrais.cor,
+      "frequencia": dadosCadastrais.frequencia,
+      "caps": dadosCadastrais.caps,
+      "prontuario": dadosCadastrais.prontuario,
+      "cns": dadosCadastrais.cns,
+      "cid": dadosCadastrais.cid,
+      "inicioTratamento": dadosCadastrais.inicioTratamento,
+      "drogas": dadosCadastrais.drogas,
+      "doenca": dadosCadastrais.doenca,
+      "usaMedicacao": dadosCadastrais.usaMedicacao,
+      "alergiaMedicamento": dadosCadastrais.alergiaMedicamento,
+      "familiaVuneravel": dadosCadastrais.familiaVuneravel,
+      "beneficioSocial": dadosCadastrais.beneficioSocial,
+      "escolaridade": dadosCadastrais.escolaridade,
+      "motivoAcolhimento": dadosCadastrais.motivoAcolhimento,
+      "servicoEncaminhado": dadosCadastrais.servicoEncaminhado,
+      "condutaImediata": dadosCadastrais.condutaImediata,
+      "telContato": dadosCadastrais.telContato,
+      "tecResponsavel": dadosCadastrais.tecResponsavel,
+      "password": "smbji"
+    }
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/cidadao`, cadastro, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    }).then(e => {
+      setDadosCadastrais([])
+      setActiveTab('pessoal')
+      closeModal(false)
+      toast.success(e.data, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      console.log('Paciente cadastrado com sucesso')
+    }).catch(e => {
+      toast.error(`Verifique as informações e tente novamente. ${e}`, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    })
+  }
+
   return (
-    <>
-      <h2>Finalização</h2>
-    </>
+    <div className="w-full">
+      <h2 className="mb-3 font-semibold text-gray-800">Resumo do Cadastro</h2>
+      {
+        !dadosCadastrais ? <span>Não existe informações de cadastro</span> : (
+          <div>
+            <h2 className='my-1'>Informações Pessoais</h2>
+            <pre className="flex bg-gray-100 rounded shadow">
+              <div className="flex flex-wrap w-full my-3 text-left ">
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Nome completo : {dadosCadastrais.nome}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Data de nascimento: {moment(dadosCadastrais.birthday).format("DD/MM/YYYY")}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    CPF: {dadosCadastrais.cpf}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Nome da mãe: {dadosCadastrais.mae}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Nome do pai: {dadosCadastrais.pai}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Nome do conjuge: {dadosCadastrais.conjuge}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Gênero: {dadosCadastrais.genero}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Raça/Cor: {dadosCadastrais.cor}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Telefone para contato: {phoneMask(dadosCadastrais.telContato)}
+                  </label>
+                </div>
+              </div>
+            </pre >
+
+            <h2 className='mt-4'>Informações Sociais</h2>
+            <pre className="flex bg-gray-100 rounded shadow">
+              <div className="flex flex-wrap w-full my-3 text-left">
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Prontuario: {dadosCadastrais.prontuario}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    cns: {dadosCadastrais.cns}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    cid: {dadosCadastrais.cid}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Técnico Responsável: {dadosCadastrais.tecResponsavel}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Frequencia do usuário: {dadosCadastrais.frequencia}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Inicio do tratamento: {moment(dadosCadastrais.inicioTratamento).format("DD/MM/YYYY")}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Alcool/Drogas: {dadosCadastrais.drogas}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Doença: {dadosCadastrais.doenca}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Usa Medicacao: {dadosCadastrais.usaMedicacao}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Alergia Medicamento: {dadosCadastrais.alergiaMedicamento}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Usuário do caps: {dadosCadastrais.caps}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Familia Vuneravel: {dadosCadastrais.familiaVuneravel}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Beneficio Social: {dadosCadastrais.beneficioSocial}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Escolaridade: {dadosCadastrais.escolaridade}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Motivo do Acolhimento: {dadosCadastrais.motivoAcolhimento}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Servico Encaminhado: {dadosCadastrais.servicoEncaminhado}
+                  </label>
+                </div>
+                <div className="w-full md:w-1/3 px-3 my-3">
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                    Conduta Imediata: {dadosCadastrais.condutaImediata}
+                  </label>
+                </div>
+              </div>
+            </pre>
+
+            <div className="border-t-[1px] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+              <button
+                onClick={finalizarCadastro}
+                className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+              >
+                Finalizar cadastro
+              </button>
+            </div>
+          </div>
+        )
+      }
+    </div>
   )
 }
