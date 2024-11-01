@@ -100,8 +100,8 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
                 {
                   isAddress ? (
                     <div className='flex items-center gap-3'>
-                      <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-                        <UserPlusIcon aria-hidden="true" className="h-6 w-6 text-green-600" />
+                      <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-cyan-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <UserPlusIcon aria-hidden="true" className="h-6 w-6 text-cyan-600" />
                       </div>
                       <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
                         Usuário cadastrado com sucesso!
@@ -109,8 +109,8 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
                     </div>
                   ) : (
                     <div className='flex items-center gap-3'>
-                      <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-                        <UserPlusIcon aria-hidden="true" className="h-6 w-6 text-green-600" />
+                      <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-cyan-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <UserPlusIcon aria-hidden="true" className="h-6 w-6 text-cyan-600" />
                       </div>
                       <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
                         Novo cadastro de paciente
@@ -172,7 +172,7 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
                         <div className="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                           <button
                             type="submit"
-                            className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+                            className="inline-flex w-full justify-center rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 sm:ml-3 sm:w-auto"
                           >
                             Cadastrar
                           </button>
@@ -258,7 +258,7 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
                         <div className="border-t-[1px] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                           <button
                             type="submit"
-                            className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+                            className="inline-flex w-full justify-center rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 sm:ml-3 sm:w-auto"
                           >
                             Cadastrar
                           </button>

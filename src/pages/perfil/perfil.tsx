@@ -29,12 +29,12 @@ export default function Consultation() {
 
   return (
     <div>
-      <div className="mb-3">
-        <h2 className="font-semibold text-lg flex items-center">Perfil de usuário <ChevronRight className="w-4" /> {user?.name || 'Usuário desconectado...'}</h2>
-      </div>
-      <div className="bg-white p-3 rounded-md shadow-md">
-        <div className="bg-[#B4E1FA] p-5 rounded-md shadow-md flex gap-4">
-          <img alt="Perfil" className="w-36 h-36 rounded-md shadow-sm" src={`${`https://ui-avatars.com/api/?name=${user?.name}&background=1E3A56&color=B4E1FA&bold=true`}`} />
+      <div className="bg-white text-gray-700 p-3 rounded-md shadow-md">
+        <div className="mb-3">
+          <h2 className="font-semibold text-lg flex items-center">Perfil de usuário <ChevronRight className="w-4" /> {user?.name || 'Usuário desconectado...'}</h2>
+        </div>
+        <div className="py-3 flex gap-4">
+          <img alt="Perfil" className="w-36 h-36 rounded-md shadow-sm" src={`${`https://ui-avatars.com/api/?name=${user?.name}&background=e0f7fa&color=00838f&bold=true`}`} />
           <div className="flex flex-col justify-between font-semibold">
             <h2 className="text-xl md:text-3xl">{user?.name || 'Usuário desconectado...'}</h2>
             <p>Função: {user?.role || 'Usuário desconectado...'}</p>

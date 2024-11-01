@@ -68,25 +68,26 @@ const ItemPage = ({ params }: any) => {
       <SidebarTrue />
       <div className="w-full md:py-5 py-20 px-5 h-screen z-0">
         <div className="bg-white p-5 rounded-md shadow-md my-5">
-          <div className="grid gap-5 grid-cols-2 md:grid-cols-4 md:text-center rounded-md md:gap-10 mb-5 md:bg-gray-100">
-            <div className="md:m-5 p-2 bg-gray-100 md:bg-white rounded shadow-md">
+          <div className="grid p-3 gap-5 grid-cols-2 md:grid-cols-4 md:text-center rounded-md md:gap-10 mb-5 md:bg-cyan-50 text-gray-700">
+            <div className="p-2 bg-cyan-50 text-gray-700 md:bg-white rounded shadow-md">
               <h2 className="font-semibold text-sm md:text-base">Prontuário:</h2>
               <span>{cidadao?.prontuario}</span>
             </div>
-            <div className="md:m-5 p-2 bg-gray-100 md:bg-white rounded shadow-md">
+            <div className="p-2 bg-cyan-50 text-gray-700 md:bg-white rounded shadow-md">
               <h2 className="font-semibold text-sm md:text-base">Paciente:</h2>
               <span>{cidadao?.paciente}</span>
             </div>
-            <div className="md:m-5 p-2 bg-gray-100 md:bg-white rounded shadow-md">
+            <div className="p-2 bg-cyan-50 text-gray-700 md:bg-white rounded shadow-md">
               <h2 className="font-semibold text-sm md:text-base">Responsável técnico:</h2>
               <span>{cidadao?.respTec}</span>
             </div>
-            <div className="md:m-5 p-2 bg-gray-100 md:bg-white rounded shadow-md">
+            <div className="p-2 bg-cyan-50 text-gray-700 md:bg-white rounded shadow-md">
               <h2 className="font-semibold text-sm md:text-base">Função técnica:</h2>
               <span>{cidadao?.role}</span>
             </div>
           </div>
-          <div className="bg-gray-100 p-5 rounded-md shadow">
+
+          <div className="bg-cyan-50 text-gray-700 p-3 rounded-md shadow">
             <h2 className="font-semibold">Descrição da consulta:</h2>
             <div className="bg-white p-5 rounded shadow-sm">
               {consulta.split('\n').map((line, index) => (
@@ -94,25 +95,25 @@ const ItemPage = ({ params }: any) => {
               ))}
             </div>
           </div>
-          {
-            medicamentos.length == 0 ? '' : (
-              <div className="bg-gray-100 p-5 mt-5 rounded-md shadow">
-                <h2 className="font-semibold">Medicamentos:</h2>
-                {medicamentos.map((item: any, index: any) => (
-                  <Accordion placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} key={index} className="bg-white my-3 rounded-md px-5 shadow-md relative z-0" open={open === item.id} icon={<Icon id={item.id} open={open} />}>
-                    <AccordionHeader placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} onClick={() => handleOpen(item.id)} className="text-sm font-semibold border-none">{item.prescricao}</AccordionHeader>
-                    <AccordionBody>
-                      <p><span className="font-semibold">Nome:</span> {item.prescricao}</p>
-                      <p><span className="font-semibold">Quantidade:</span> {item.quantidade}</p>
-                      <p><span className="font-semibold">Modo de uso:</span> {item.use || '12/12 horas - Uso oral'}</p>
-                    </AccordionBody>
-                  </Accordion>
-                ))}
-              </div>
-            )
-          }
-          <div className="bg-gray-100 p-5 mt-5 rounded-md shadow w-full lg:max-w-[35%]">
-            <h2 className="font-semibold">Consulta realizada:</h2>
+
+          {medicamentos.length == 0 ? '' : (
+            <div className="bg-cyan-50 text-gray-700 p-3 mt-5 rounded-md shadow lg:w-1/3 w-full">
+              <h2 className="font-semibold">Medicamentos:</h2>
+              {medicamentos.map((item: any, index: any) => (
+                <Accordion placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} key={index} className="bg-white my-3 rounded-md px-5 shadow-md relative z-0" open={open === item.id} icon={<Icon id={item.id} open={open} />}>
+                  <AccordionHeader placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} onClick={() => handleOpen(item.id)} className="text-sm font-semibold border-none capitalize">{item.prescricao}</AccordionHeader>
+                  <AccordionBody>
+                    <p className="capitalize"><span className="font-semibold">Nome:</span> {item.prescricao}</p>
+                    <p><span className="font-semibold">Quantidade:</span> {item.quantidade}</p>
+                    <p><span className="font-semibold">Tempo de uso:</span> {item.use || '8/8 horas - Uso oral'}</p>
+                  </AccordionBody>
+                </Accordion>
+              ))}
+            </div>
+          )}
+
+          <div className="bg-cyan-50 text-gray-700 p-3 mt-5 rounded-md shadow w-full lg:w-1/3">
+            <h2 className="font-semibold">Data da consulta realizada:</h2>
             <span className="text-gray-500">{moment(cidadao?.createAt).format("DD/MM/YYYY - HH:mm")}</span>
             <p className="font-thin text-sm text-gray-500">{cidadao?.id}</p>
           </div>

@@ -6,11 +6,13 @@ import {
   NumberedListIcon
 } from "@heroicons/react/24/solid";
 import axios from 'axios';
-import clsx from "clsx";
+import clsx from 'clsx';
 import Cookie from 'js-cookie';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { FiAlertTriangle } from "react-icons/fi";
+import { ImSpinner2 } from "react-icons/im";
 import InputMask from 'react-input-mask';
 import { toast } from 'react-toastify';
 
@@ -46,20 +48,20 @@ interface CadastroCidadao {
 
 export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
   const [activeTab, setActiveTab] = useState('pessoal');
-  const [dadosCadastrais, setDadosCadastrais] = useState<CadastroCidadao>()
+  const [dadosCadastrais, setDadosCadastrais] = useState<CadastroCidadao>([] as any)
 
   const data = [
     {
-      label: "Detalhe Pessoal",
+      label: "Informações Pessoais",
       value: "pessoal",
       icon: NumberedListIcon,
-      component: DadosPessoais({ setDadosCadastrais, setActiveTab })
+      component: DadosPessoais({ setDadosCadastrais, setActiveTab, closeModal })
     },
     {
-      label: "Detalhe Social",
+      label: "Informações Sociais",
       value: "social",
       icon: NumberedListIcon,
-      component: DadosSociais({ setDadosCadastrais, setActiveTab })
+      component: DadosSociais({ setDadosCadastrais, setActiveTab, closeModal })
     },
     {
       label: "Finalizar Cadastro",
@@ -68,8 +70,6 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
       component: Final({ dadosCadastrais, setDadosCadastrais, setActiveTab, closeModal })
     }
   ];
-
-  console.log(dadosCadastrais)
 
   return (
     <Dialog open={openModal} onClose={closeModal} className="relative z-10">
@@ -84,29 +84,57 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
             transition
             className={`relative transform overflow-hidden rounded-lg bg-white min-h-[600px] w-full text-left shadow-xl transition-all data-[closed]:translate-y-40 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-[80%] data-[closed]:sm:translate-y-10 data-[closed]:sm:scale-95`}>
 
-            <div className="gap-2">
-              <div className='shadow-md p-4 bg-cyan-800 flex gap-4 justify-around'>
-                {data.map(({ label, value, icon }) => (
-                  <button key={value} className={
-                    clsx('p-4 px-8 rounded-lg',
-                      {
-                        'bg-white shadow-md': activeTab === value
-                      }
-                    )} onClick={() => {
-                      console.log({ value })
-                      setActiveTab(value)
-                    }}>
-                    <div className="flex items-center gap-1 relative">
-                      {React.createElement(icon, { className: "w-5 h-5" })}
-                      <b>{label}</b>
-                      <span className='rounded-full absolute top-[-10px] right-[-20px] border-2 shadow-md border-cyan-900 h-5 w-5 text-sm font-bold flex items-center justify-center'>
+            <div className="gap-2 h-[820px] overflow-auto">
+              <div className='shadow-md p-4 bg-cyan-800 md:bg-white gap-4 justify-around flex'>
+                <div className='hidden md:flex md:justify-between items-center w-full'>
+                  {data.map(({ label, value, icon }) => (
+                    <button
+                      key={value}
+                      className={
+                        clsx('p-4 px-8 rounded-lg w-full text-gray-600 cursor-default',
+                          {
+                            'shadow-md bg-cyan-800 text-white': activeTab === value
+                          }
+                        )}
+                    // onClick={() => {
+                    //   setActiveTab(value)
+                    // }}
+                    >
+                      <div className="flex items-center gap-1 relative">
+                        {React.createElement(icon, { className: "w-5 h-5" })}
+                        <b>{label}</b>
+                        <span className={
+                          clsx('rounded-full border-cyan-900 absolute top-[-10px] right-[-20px] border-2 shadow-md h-5 w-5 text-sm font-bold flex items-center justify-center',
+                            {
+                              'border-white': activeTab === value
+                            }
+                          )
+                        }>
+                          {
+                            value == 'pessoal' ? 1 : value == 'social' ? 2 : 3
+                          }
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="flex md:hidden justify-between items-center w-full">
+                  <div className="flex items-center gap-1 relative text-white font-semibold uppercase">
+                    <b>{data?.find(item => item.value === activeTab)?.label}</b>
+                    <span className={
+                      clsx('rounded-full border-cyan-900 absolute top-[-10px] right-[-20px] border-2 shadow-md h-5 w-5 text-sm font-bold flex items-center justify-center',
                         {
-                          value == 'pessoal' ? 1 : value == 'social' ? 2 : 3
+                          'border-white': activeTab === data?.find(item => item.value === activeTab)?.value
                         }
-                      </span>
-                    </div>
-                  </button>
-                ))}
+                      )
+                    }>
+                      {
+                        data?.find(item => item.value === activeTab)?.value == 'pessoal' ? 1 : data?.find(item => item.value === activeTab)?.value == 'social' ? 2 : 3
+                      }
+                    </span>
+                  </div>
+                  <button className='text-white font-semibold border rounded-md px-3 py-1 hover:bg-white hover:text-black transition-all' onClick={() => { closeModal(false) }}>X</button>
+                </div>
               </div>
               <div className="p-8">
                 {data?.find(item => item.value === activeTab)?.component ?? <div>Não existe informações disponíveis</div>}
@@ -120,7 +148,7 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
   )
 }
 
-function DadosPessoais({ setDadosCadastrais, setActiveTab }: any) {
+function DadosPessoais({ setDadosCadastrais, setActiveTab, closeModal }: any) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
   const DadoPessoal = (data: any) => {
@@ -265,10 +293,10 @@ function DadosPessoais({ setDadosCadastrais, setActiveTab }: any) {
           </div>
         </div>
 
-        <div className="border-t-[1px] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+        <div className="border-t-[1px] py-3 sm:flex sm:flex-row-reverse justify-between items-center">
           <button
             type="submit"
-            className={`cursor-pointer bg-green-600 hover:bg-green-500 inline-flex w-full justify-center rounded-md  px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto`}
+            className={`cursor-pointer bg-cyan-800 hover:bg-cyan-700 inline-flex w-full justify-center rounded-md  px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto`}
           >
             Avançar
           </button>
@@ -280,6 +308,16 @@ function DadosPessoais({ setDadosCadastrais, setActiveTab }: any) {
             className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
           >
             Limpar
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              // reset()
+              closeModal(false)
+            }}
+            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+          >
+            Cancelar
           </button>
         </div>
       </form>
@@ -466,10 +504,10 @@ function DadosSociais({ setDadosCadastrais, setActiveTab }: any) {
         </div>
       </div>
 
-      <div className="border-t-[1px] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+      <div className="border-t-[1px] py-3 sm:flex sm:flex-row-reverse justify-between items-center">
         <button
           type="submit"
-          className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+          className="inline-flex w-full justify-center rounded-md bg-cyan-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3 sm:w-auto"
         >
           Avançar
         </button>
@@ -482,12 +520,22 @@ function DadosSociais({ setDadosCadastrais, setActiveTab }: any) {
         >
           Limpar
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab('pessoal')
+          }}
+          className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+        >
+          Voltar
+        </button>
       </div>
     </form>
   )
 }
 
-function Final({ dadosCadastrais, setDadosCadastrais, setActiveTab, closeModal }: any) {
+function Final({ dadosCadastrais, setDadosCadastrais, setActiveTab, closeModal, reset }: any) {
+  const [loading, setLoading] = useState(false);
   const phoneMask = (value: any) => {
     if (!value) return ""
     value = value.replace(/\D/g, '')
@@ -533,37 +581,46 @@ function Final({ dadosCadastrais, setDadosCadastrais, setActiveTab, closeModal }
         'Authorization': `Bearer ${token}`
       },
     }).then(e => {
-      setDadosCadastrais([])
-      setActiveTab('pessoal')
-      closeModal(false)
-      toast.success(e.data, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      console.log('Paciente cadastrado com sucesso')
+      setLoading(true)
+      setTimeout(() => {
+        closeModal(false)
+        setDadosCadastrais([])
+        setActiveTab('pessoal')
+        toast.success(e.data, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }, 1000);
     }).catch(e => {
-      toast.error(`Verifique as informações e tente novamente. ${e}`, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      setLoading(true)
+      setTimeout(() => {
+        toast.error(`${e.response.data.message}`, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        })
+      }, 1200);
+    }).finally(() => {
+      setTimeout(() => {
+        setLoading(false)
+      }, 1000);
     })
   }
 
   return (
     <div className="w-full">
-      <h2 className="mb-3 font-semibold text-gray-800">Resumo do Cadastro</h2>
+      <h2 className="mb-3 font-semibold text-gray-800">Resumo do Cadastro {dadosCadastrais.length < 26 ? <span className='text-red-500 font-semibold text-xs uppercase flex items-center gap-2'><FiAlertTriangle /> Existe informações pendentes</span> : ''}</h2>
       {
         !dadosCadastrais ? <span>Não existe informações de cadastro</span> : (
           <div>
@@ -571,151 +628,176 @@ function Final({ dadosCadastrais, setDadosCadastrais, setActiveTab, closeModal }
             <pre className="flex bg-gray-100 rounded shadow">
               <div className="flex flex-wrap w-full my-3 text-left ">
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Nome completo : {dadosCadastrais.nome}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Nome completo : {dadosCadastrais.nome || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Data de nascimento: {moment(dadosCadastrais.birthday).format("DD/MM/YYYY")}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Data de nascimento: {!!dadosCadastrais.birthday && moment(dadosCadastrais.birthday).format("DD/MM/YYYY") || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    CPF: {dadosCadastrais.cpf}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    CPF: {dadosCadastrais.cpf || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Nome da mãe: {dadosCadastrais.mae}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Nome da mãe: {dadosCadastrais.mae || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Nome do pai: {dadosCadastrais.pai}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Nome do pai: {dadosCadastrais.pai || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Nome do conjuge: {dadosCadastrais.conjuge}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Nome do conjuge: {dadosCadastrais.conjuge || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Gênero: {dadosCadastrais.genero}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Gênero: {dadosCadastrais.genero || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Raça/Cor: {dadosCadastrais.cor}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Raça/Cor: {dadosCadastrais.cor || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Telefone para contato: {phoneMask(dadosCadastrais.telContato)}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Telefone para contato: {phoneMask(dadosCadastrais.telContato) || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
               </div>
             </pre >
 
             <h2 className='mt-4'>Informações Sociais</h2>
-            <pre className="flex bg-gray-100 rounded shadow">
+            <pre className="flex bg-gray-100 rounded shadow mb-3">
               <div className="flex flex-wrap w-full my-3 text-left">
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Prontuario: {dadosCadastrais.prontuario}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Prontuario: {dadosCadastrais.prontuario || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    cns: {dadosCadastrais.cns}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    cns: {dadosCadastrais.cns || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    cid: {dadosCadastrais.cid}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    cid: {dadosCadastrais.cid || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Técnico Responsável: {dadosCadastrais.tecResponsavel}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Técnico Responsável: {dadosCadastrais.tecResponsavel || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Frequencia do usuário: {dadosCadastrais.frequencia}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Frequencia do usuário: {dadosCadastrais.frequencia || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Inicio do tratamento: {moment(dadosCadastrais.inicioTratamento).format("DD/MM/YYYY")}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Inicio do tratamento: {!!dadosCadastrais.inicioTratamento && moment(dadosCadastrais.inicioTratamento).format("DD/MM/YYYY") || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Alcool/Drogas: {dadosCadastrais.drogas}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Alcool/Drogas: {dadosCadastrais.drogas || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Doença: {dadosCadastrais.doenca}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Doença: {dadosCadastrais.doenca || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Usa Medicacao: {dadosCadastrais.usaMedicacao}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Usa Medicacao: {dadosCadastrais.usaMedicacao || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Alergia Medicamento: {dadosCadastrais.alergiaMedicamento}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Alergia Medicamento: {dadosCadastrais.alergiaMedicamento || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Usuário do caps: {dadosCadastrais.caps}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Usuário do caps: {dadosCadastrais.caps || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Familia Vuneravel: {dadosCadastrais.familiaVuneravel}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Familia Vuneravel: {dadosCadastrais.familiaVuneravel || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Beneficio Social: {dadosCadastrais.beneficioSocial}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Beneficio Social: {dadosCadastrais.beneficioSocial || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Escolaridade: {dadosCadastrais.escolaridade}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Escolaridade: {dadosCadastrais.escolaridade || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Motivo do Acolhimento: {dadosCadastrais.motivoAcolhimento}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Motivo do Acolhimento: {dadosCadastrais.motivoAcolhimento || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Servico Encaminhado: {dadosCadastrais.servicoEncaminhado}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Servico Encaminhado: {dadosCadastrais.servicoEncaminhado || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
                 <div className="w-full md:w-1/3 px-3 my-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                    Conduta Imediata: {dadosCadastrais.condutaImediata}
+                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                    Conduta Imediata: {dadosCadastrais.condutaImediata || <span className='text-red-500 underline font-semibold'>Não informado</span>}
                   </label>
                 </div>
               </div>
             </pre>
 
-            <div className="border-t-[1px] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-              <button
-                onClick={finalizarCadastro}
-                className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
-              >
-                Finalizar cadastro
-              </button>
+            <div className="border-t-[1px] py-3 sm:flex sm:flex-row-reverse justify-between items-center">
+              {
+                dadosCadastrais.length < 26 ? (
+                  <button
+                    onClick={() => {
+                      setActiveTab('pessoal')
+                    }}
+                    className="inline-flex transition-all uppercase w-full justify-center rounded-md bg-red-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-gray-200 sm:ml-3 sm:w-auto"
+                  >
+                    Voltar e preencher
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={finalizarCadastro}
+                      disabled={loading}
+                      className="inline-flex w-full sm:w-48 transition-all justify-center uppercase rounded-md bg-cyan-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3"
+                    >
+                      {loading ? <ImSpinner2 className='animate-spin text-lg' /> : "Cadastrar paciente"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('social')
+                      }}
+                      className="mt-3 inline-flex w-full justify-center rounded-md uppercase bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    >
+                      Voltar
+                    </button>
+                  </>
+                )
+              }
             </div>
           </div>
         )

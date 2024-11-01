@@ -39,7 +39,7 @@ export default function ListarCidadao() {
               setOpen(true)
               setSenhaCidadao(Math.floor(1000 + Math.random() * 9000))
             }}
-            className="bg-indigo-800 hover:bg-indigo-700 text-white transition-all shadow-md font-medium px-3 py-1 rounded-lg flex items-center gap-2">
+            className="bg-cyan-800 hover:bg-cyan-700 text-white transition-all shadow-md font-medium px-3 py-1 rounded-lg flex items-center gap-2">
             <CircleFadingPlus size={20} />
             Cadastrar novo
           </button>
@@ -70,7 +70,7 @@ export default function ListarCidadao() {
                         <td className="text-center">{FormatCPF(item.cpf)}</td>
                         <td className="text-center">{item.caps == false ? 'Não' : 'Sim'}</td>
                         <td className="flex items-center justify-center gap-2 py-5">
-                          <button className="bg-blue-500 hover:bg-blue-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
+                          <button className="bg-cyan-500 hover:bg-cyan-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
                             <Eye size={15} />
                           </button>
                         </td>

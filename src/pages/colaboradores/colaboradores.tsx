@@ -38,9 +38,9 @@ export default function ListaColaboradores() {
               setOpen(true)
               setSenhaCidadao(Math.floor(1000 + Math.random() * 9000))
             }}
-            className="bg-indigo-800 hover:bg-indigo-700 text-white transition-all shadow-md font-medium px-3 py-1 rounded-lg flex items-center gap-2">
+            className="bg-cyan-800 hover:bg-cyan-700 text-white transition-all shadow-md font-medium px-3 py-1 rounded-lg flex items-center gap-2">
             <CircleFadingPlus size={20} />
-            Cadastrar novo
+            Novo colaborador
           </button>
         </div>
 
@@ -65,7 +65,7 @@ export default function ListaColaboradores() {
                         <td className="text-center">{item.username}</td>
                         <td className="text-center">{item.active ? 'A menos de 8 horas' : '2 dias ou mais'}</td>
                         <td className="flex items-center justify-center gap-2 py-5">
-                          <Link href={`/colaboradores/${item.cpf}`} className="bg-blue-500 hover:bg-blue-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
+                          <Link href={`/colaboradores/${item.cpf}`} className="bg-cyan-500 hover:bg-cyan-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
                             <Eye size={15} />
                           </Link>
                         </td>

@@ -13,14 +13,14 @@ export default function Dropdown() {
   return (
     <Menu as="div" className="relative w-full inline-block text-left">
 
-      <MenuButton className={`inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white ${expanded ? 'px-3  py-2' : 'px-0'} text-sm font-semibold text-gray-900 hover:bg-indigo-100 transition-all`}>
+      <MenuButton className={`inline-flex w-full justify-center gap-x-1.5 rounded-md ${expanded ? 'px-3 py-2 hover:bg-cyan-100' : 'px-0'} text-sm font-semibold text-gray-900 transition-all`}>
         <div className={`flex gap-3 justify-between items-center overflow-hidden transition-all`}>
-          <img src={`https://ui-avatars.com/api/?name=${name}&background=c7d2fe&color=3730a3&bold=true`} className="w-10 h-10 rounded-md" alt="" />
+          <img src={`https://ui-avatars.com/api/?name=${name}&background=e0f7fa&color=00838f&bold=true`} className="w-10 h-10 rounded-md hover:-translate-y-1 transition-all" alt="" />
           <div>
             <h4 className="font-semibold capitalize">{name}</h4>
             <span className="text-xs text-gray-600 capitalize">id: {idEnf}</span>
           </div>
-          <ChevronUpIcon aria-hidden="true" className="h-5 w-5 text-gray-400" />
+          <ChevronUpIcon aria-hidden="true" className="h-5 w-5 text-gray-600" />
         </div>
       </MenuButton>
 
@@ -34,9 +34,9 @@ export default function Dropdown() {
               onClick={() => {
                 push('/perfil')
               }}
-              className="flex gap-2 px-2 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
+              className="flex gap-2 px-2 py-2 text-sm text-gray-600 data-[focus]:bg-cyan-50 data-[focus]:text-gray-900"
             >
-              <FaRegUser aria-hidden="true" className="h-5 w-5 text-gray-400" />
+              <FaRegUser aria-hidden="true" className="h-5 w-5 text-gray-600" />
               Perfil
             </a>
           </MenuItem>
@@ -48,9 +48,9 @@ export default function Dropdown() {
                 destroyCookie(null, 'accessToken')
                 push('/login')
               }}
-              className="flex gap-2 px-2 py-2 w-full text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
+              className="flex gap-2 px-2 py-2 w-full text-sm text-gray-600 data-[focus]:bg-cyan-50 data-[focus]:text-gray-900"
             >
-              <MdLogout aria-hidden="true" className="h-5 w-5 text-gray-400" />
+              <MdLogout aria-hidden="true" className="h-5 w-5 text-gray-600" />
               Sair
             </button>
           </MenuItem>

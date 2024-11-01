@@ -42,7 +42,7 @@ export function Sidebar({ children }: string | any) {
         <div className="p-4 pb-2 flex justify-between items-center">
           <div className={`flex items-center gap-2 overflow-hidden duration-500 transition-all ${expanded ? 'w-28' : ''}`}>
             <Image src={logo} className={`w-8`} alt="" />
-            <span className="font-semibold text-indigo-800">Vivamed</span>
+            <span className="font-semibold text-cyan-800">Vivamed</span>
           </div>
           <button
             onClick={() => setExpanded(click => !click)}
@@ -78,9 +78,9 @@ export function SidebarItem({ icon, text, active, alert, subMenu, children, url 
       }
       if (subMenu) setClickMenu(!clickMenu)
     }} className={`
-    relative py-2 px-3 my-2 font-medium rounded-md border-l-4 border-indigo-200 shadow cursor-pointer hover:translate-x-2 transition-all group text-gray-600
-    ${clickMenu ? 'bg-gradient-to-tl from-indigo-200 to-indigo-100 text-indigo-800 hover:-translate-x-0' : ''}
-    ${active ? 'bg-gradient-to-tl from-indigo-200 to-indigo-100 text-indigo-800' : 'hover:bg-indigo-100 hover:shadow-lg '}
+    relative py-2 px-3 my-2 font-medium rounded-md border-l-4 border-cyan-200 shadow cursor-pointer hover:translate-x-2 transition-all group text-gray-600
+    ${clickMenu ? 'bg-gradient-to-tl from-cyan-200 to-cyan-100 text-cyan-800 hover:-translate-x-0' : ''}
+    ${active ? 'bg-gradient-to-tl from-cyan-200 to-cyan-100 text-cyan-800' : 'hover:bg-cyan-50 hover:shadow-lg '}
     `}>
       <Link href={`${url ? url : '#'}`}>
         <div className="flex items-center">
@@ -88,9 +88,9 @@ export function SidebarItem({ icon, text, active, alert, subMenu, children, url 
           <span className={`overflow-hidden transition-all ${expanded ? 'w-52 ml-3' : 'w-0'}`}>{text}</span>
           {subMenu && <div className={`${expanded ? '' : 'hidden'} mr-2 transition-all`}>{!clickMenu ? <ChevronDown /> : <ChevronUp />}</div>}
 
-          {alert && <div className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 animate-pulse duration-1000 ${expanded ? '' : 'top-2'}`} />}
+          {alert && <div className={`absolute right-2 w-2 h-2 rounded bg-cyan-400 animate-pulse duration-1000 ${expanded ? '' : 'top-2'}`} />}
 
-          {!expanded && <div className={`absolute left-full rounded-md px-2 py-1 ml-6 bg-indigo-100 text-indigo-800 text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}>{text}</div>}
+          {!expanded && <div className={`absolute left-full rounded-md px-2 py-1 ml-6 bg-cyan-100 text-cyan-800 text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}>{text}</div>}
         </div>
         {expanded && <div className={`${clickMenu ? 'flex py-2 my-1' : 'hidden'} mr-2 transition-all`}>{children}</div>}
       </Link>
@@ -102,7 +102,7 @@ export function SidebarItem({ icon, text, active, alert, subMenu, children, url 
 export const SidebarSubmenu = ({ name, url, icon }: any) => {
   return (
     <ul className="py-1 w-full space-y-2">
-      <li className="hover:translate-x-2 bg-white rounded-lg border-indigo-200 border-l-4 shadow-md transition-all">
+      <li className="hover:translate-x-2 bg-white rounded-lg border-cyan-200 border-l-4 shadow-md transition-all">
         <Link href={url} className="flex items-center gap-3 w-full p-2 transition duration-75">
           {icon}
           {name}

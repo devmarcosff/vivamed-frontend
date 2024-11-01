@@ -6,20 +6,23 @@ import axios from 'axios';
 import Cookie from 'js-cookie';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { ImSpinner2 } from 'react-icons/im';
+import { toast } from 'react-toastify';
 
 export default function CadastrarCidadaoModal({ openModal, closeModal, senhaCidadao }: any) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [isSenha, setIsSenha] = useState<any>()
   const [isRegistro, setIsRegistro] = useState<any>()
   const token = Cookie.get('accessToken');
+  const [loading, setLoading] = useState(false);
 
   const createColaborador = async (data: any) => {
     var cadastro = {
       "name": data.name,
       "cpf": data.cpf,
-      "idProf": data.idProf,
-      "role": data.role,
       "birthday": data.birthday,
+      "role": data.role,
+      "idProf": data.idProf,
       "username": data.username,
       "password": `${senhaCidadao}`
     }
@@ -30,10 +33,42 @@ export default function CadastrarCidadaoModal({ openModal, closeModal, senhaCida
         'Authorization': `Bearer ${token}`
       },
     }).then(e => {
-      reset()
-      setIsSenha(senhaCidadao)
-      setIsRegistro(cadastro)
-    }).catch(e => console.log(e))
+      setLoading(true)
+      setTimeout(() => {
+        toast.success("Colaborador cadastrado com sucesso.", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        reset()
+        setIsSenha(senhaCidadao)
+        setIsRegistro(cadastro)
+      }, 1000);
+    }).catch(e => {
+      setLoading(true)
+      setTimeout(() => {
+        toast.error(`${e.response.data.message}`, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        reset()
+      }, 1000);
+    }).finally(() => {
+      setTimeout(() => {
+        setLoading(false)
+      }, 1000);
+    })
   }
 
   return (
@@ -56,8 +91,8 @@ export default function CadastrarCidadaoModal({ openModal, closeModal, senhaCida
                     isSenha ? (
                       <div>
                         <div className='flex items-center gap-3'>
-                          <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <UserPlusIcon aria-hidden="true" className="h-6 w-6 text-green-600" />
+                          <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-cyan-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <UserPlusIcon aria-hidden="true" className="h-6 w-6 text-cyan-800" />
                           </div>
                           <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
                             Colaborador cadastrado com sucesso
@@ -78,7 +113,7 @@ export default function CadastrarCidadaoModal({ openModal, closeModal, senhaCida
                               reset()
                               setIsSenha(!senhaCidadao)
                             }}
-                            className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+                            className="inline-flex w-full justify-center rounded-md bg-cyan-800 hover:bg-cyan-700 px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto"
                           >
                             Novo colaborador
                           </button>
@@ -99,8 +134,8 @@ export default function CadastrarCidadaoModal({ openModal, closeModal, senhaCida
                       : (
                         <>
                           <div className='flex items-center gap-3'>
-                            <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-                              <UserPlusIcon aria-hidden="true" className="h-6 w-6 text-green-600" />
+                            <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-cyan-100 sm:mx-0 sm:h-10 sm:w-10">
+                              <UserPlusIcon aria-hidden="true" className="h-6 w-6 text-cyan-800" />
                             </div>
                             <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
                               Novo cadastro de colaborador
@@ -175,9 +210,10 @@ export default function CadastrarCidadaoModal({ openModal, closeModal, senhaCida
                             <div className="border-t-[1px] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                               <button
                                 type="submit"
-                                className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+                                disabled={loading}
+                                className="inline-flex w-full sm:w-44 justify-center rounded-md bg-cyan-800 hover:bg-cyan-700 px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3"
                               >
-                                Cadastrar
+                                {loading ? <ImSpinner2 className='animate-spin text-lg text-center' /> : "Inserir colaborador"}
                               </button>
                               <button
                                 type="button"

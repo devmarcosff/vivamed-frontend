@@ -42,9 +42,9 @@ export default function Consultation() {
             onClick={() => {
               setOpen(true)
             }}
-            className="bg-indigo-800 hover:bg-indigo-700 text-white transition-all shadow-md font-medium px-3 py-1 rounded-lg flex items-center gap-2">
+            className="bg-cyan-800 hover:bg-cyan-700 text-white transition-all shadow-md font-semibold px-3 py-1 rounded-lg flex items-center gap-2">
             <CircleFadingPlus size={20} />
-            Realizar consulta
+            Nova consulta
           </button>
         </div>
 
@@ -71,7 +71,7 @@ export default function Consultation() {
                         <td className="text-center max-w-44 truncate">{item.respTec}</td>
                         <td className="text-center max-w-44 truncate">{moment(item.createAt).format("DD/MM/YYYY - HH:mm")}</td>
                         <td className="flex items-center justify-center gap-2 py-5">
-                          <button onClick={() => handleNavigate(item.id)} className="bg-blue-500 hover:bg-blue-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
+                          <button onClick={() => handleNavigate(item.id)} className="bg-cyan-500 hover:bg-cyan-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
                             <Eye size={15} />
                           </button>
                         </td>
