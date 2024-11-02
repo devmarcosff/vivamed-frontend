@@ -16,7 +16,7 @@ interface CadastroCidadao {
 }
 
 export default function CadastrarConsulta({ openModal, closeModal }: any) {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm();
   const token = Cookie.get('accessToken');
   const [consulta, setConsulta] = useState<any>()
   const [medicamento, setMedicamento] = useState<any>(false)
@@ -91,38 +91,34 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
         'Authorization': `Bearer ${token}`
       },
     }).then(e => {
-      setLoading(true)
-      setTimeout(() => {
-        setConsulta(e.data)
-        toast.success("Consulta inserida com sucesso.", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      }, 1000);
+      // setLoading(true)
+      // setTimeout(() => {
+      setConsulta(e.data)
+      toast.success("Consulta inserida com sucesso.", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      // }, 1000);
     }).catch(e => {
-      setLoading(true)
-      setTimeout(() => {
-        toast.error("Erro ao adicionar consulta.", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      }, 1000);
-    }).finally(() => {
-      setTimeout(() => {
-        setLoading(false)
-      }, 1000);
+      // setLoading(true)
+      // setTimeout(() => {
+      toast.error("Erro ao adicionar consulta.", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      // }, 1000);
     })
   }
 
@@ -280,7 +276,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                           <select {...register('prontuario')} name="prontuario" id="prontuario" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
                             <option value="">Selecione um paciente</option>
                             {
-                              cidadao.map((item: any, index: any) => <option value={item.prontuario} key={index}>{item.name}</option>)
+                              cidadao.map((item: any, index: any) => <option value={item.prontuario} key={index}>{item.nome}</option>)
                             }
                           </select>
                           {
@@ -292,7 +288,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             Responsável técnico *
                           </label>
                           {user && (
-                            <input {...register('respTec',)} value={user.name} className={`${errors.respTec && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            <input {...register('respTec',)} value={user.name} className={`${errors.respTec && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-500 font-semibold border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
                           )}
                           {
                             errors.respTec && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
@@ -303,7 +299,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             Cargo *
                           </label>
                           {user && (
-                            <input {...register('role')} value={user.role} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            <input {...register('role')} value={user.role} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-500 font-semibold capitalize border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
                           )}
                           {
                             errors.role && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
@@ -314,7 +310,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             Id. Profissional *
                           </label>
                           {user && (
-                            <input {...register('idProf')} value={user.idProf} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            <input {...register('idProf')} value={user.idProf} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-500 font-semibold border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
                           )}
                           {
                             errors.idProf && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
@@ -340,9 +336,10 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                       <div className="border-t-[1px] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                         <button
                           type="submit"
+                          disabled={isSubmitting}
                           className="inline-flex w-full sm:w-36 justify-center rounded-md bg-cyan-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3"
                         >
-                          {loading ? <ImSpinner2 className='animate-spin text-lg text-center' /> : "Inserir consulta"}
+                          {isSubmitting ? <ImSpinner2 className='animate-spin text-lg text-center' /> : "Inserir consulta"}
                         </button>
                         <button
                           type="button"

@@ -1,10 +1,9 @@
 "use client"
 
 import ModalCidadao from '@/components/cadastrar_cidadao.modal';
-import FormatCPF from '@/components/FormatCpf';
 import axios from "axios";
 import Cookie from 'js-cookie';
-import { CircleFadingPlus, Eye } from "lucide-react";
+import { CircleFadingPlus } from "lucide-react";
 import moment from 'moment';
 import 'moment/locale/pt';
 import { useEffect, useState } from "react";
@@ -24,38 +23,39 @@ export default function ListarCidadao() {
     }).then(e => setCidadao(e.data)).catch(e => console.log(e))
   }
 
+  // useEffect(() => {
+  //   fetchData()
+  // }, [open == false]);
   useEffect(() => {
     fetchData()
-  }, [open == false]);
+  }, [cidadao]);
 
   return (
     <>
       <div className="bg-white my-2 shadow-md rounded-md p-5 w-full max-h-full overflow-auto">
-        <div className="flex justify-between items-center w-full top-0 border-b-[1px] pb-3">
-          <h2>Pacientes cadastrados</h2>
+        <div className="flex justify-between items-center w-full top-0 pb-3">
+          <h2 className='font-semibold'>Pacientes cadastrados</h2>
 
           <button
             onClick={() => {
               setOpen(true)
               setSenhaCidadao(Math.floor(1000 + Math.random() * 9000))
             }}
-            className="bg-cyan-800 hover:bg-cyan-700 text-white transition-all shadow-md font-medium px-3 py-1 rounded-lg flex items-center gap-2">
+            className="bg-cyan-800 hover:bg-cyan-700 text-white transition-all shadow-md font-semibold px-3 py-1 rounded-lg flex items-center gap-2">
             <CircleFadingPlus size={20} />
-            Cadastrar novo
+            Novo paciente
           </button>
         </div>
 
-        <div className="py-3">
-          <div className="overflow-x-auto py-3">
-            <table className="table-auto w-full">
-              <thead>
+        {
+          cidadao.length ? (
+            <table className="table-auto w-full shadow rounded overflow-auto sm:overflow-hidden">
+              <thead className='bg-cyan-50 border-b-2 border-white'>
                 <tr>
-                  <th>Prontuário</th>
-                  <th>Nome</th>
-                  <th>Data de nascimento</th>
-                  <th>CPF</th>
-                  <th>CAPS</th>
-                  <th></th>
+                  <th className='py-5 px-2'>Prontuário</th>
+                  <th className='py-5 px-2'>Nome</th>
+                  <th className='py-5 px-2 text-wrap'>Data de nascimento</th>
+                  <th className='py-5 px-2'>CAPS</th>
                 </tr>
               </thead>
               <tbody className='text-sm h-[100px]'>
@@ -63,25 +63,24 @@ export default function ListarCidadao() {
                   cidadao.map((item: any, index: any) => {
                     moment.locale('pt')
                     return (
-                      <tr className="border-b border-slate-300" key={index}>
-                        <th className="text-center">{item.prontuario}</th>
-                        <td className="text-center max-w-44 truncate">{item.name}</td>
-                        <td className="text-center">{moment(item.birthday).format("MM/DD/YYYY")}</td>
-                        <td className="text-center">{FormatCPF(item.cpf)}</td>
+                      <tr className="border-b border-slate-300 last:border-0 hover:underline hover:bg-cyan-50 transition-all cursor-pointer" key={index}>
+                        <th className="text-center">{item.prontuario || "-"}</th>
+                        <td className="text-center text-wrap max-w-44 truncate">{item.nome || "-"}</td>
+                        <td className="text-center">{!!item.nascimento && moment(item.nascimento).format("MM/DD/YYYY") || "-"}</td>
                         <td className="text-center">{item.caps == false ? 'Não' : 'Sim'}</td>
-                        <td className="flex items-center justify-center gap-2 py-5">
-                          <button className="bg-cyan-500 hover:bg-cyan-400 text-white transition-all shadow-md font-medium h-7 w-7 rounded-lg flex justify-center items-center gap-2">
-                            <Eye size={15} />
-                          </button>
-                        </td>
                       </tr>
                     )
                   })
                 }
               </tbody>
             </table>
-          </div>
-        </div>
+          ) : (
+            <div className='bg-cyan-50 py-6 border-white text-center'>
+              <span className='font-semibold text-gray-600'>Não existe consultas cadastrada</span>
+            </div>
+
+          )
+        }
       </div>
 
       <ModalCidadao openModal={open} closeModal={setOpen} senhaCidadao={senhaCidadao} />

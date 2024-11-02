@@ -4,10 +4,11 @@ import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/re
 import { UserPlusIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import Cookie from 'js-cookie';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ImSpinner2 } from 'react-icons/im';
 import { toast } from 'react-toastify';
+import getCookie from './getCookie';
 
 export default function CadastrarCidadaoModal({ openModal, closeModal, senhaCidadao }: any) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
@@ -15,6 +16,12 @@ export default function CadastrarCidadaoModal({ openModal, closeModal, senhaCida
   const [isRegistro, setIsRegistro] = useState<any>()
   const token = Cookie.get('accessToken');
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState<any>('')
+
+  useEffect(() => {
+    const isGetCookie = getCookie()
+    setRole(isGetCookie)
+  }, [])
 
   const createColaborador = async (data: any) => {
     var cadastro = {
@@ -186,11 +193,28 @@ export default function CadastrarCidadaoModal({ openModal, closeModal, senhaCida
                                 </label>
                                 <select {...register('role')} name="role" id="role" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
                                   <option value="">Selecione uma frequencia</option>
-                                  <option value="admin">Admin</option>
-                                  <option value="administrativo">Administrador(a)</option>
-                                  <option value="coordenador">Coordenador(a)</option>
-                                  <option value="enfermeiro">Enfermeiro(a)</option>
-                                  <option value="medico">Médico(a)</option>
+                                  {
+                                    (role === "coordenadorcaps" || role === "admin") && (
+                                      <>
+                                        <option value="coordenadorcaps">Coordenador Caps</option>
+                                        <option value="administrativocaps">Administrador Caps</option>
+                                        <option value="farmaceuticocaps">Farmaceutico Caps</option>
+                                        <option value="enfermeirocaps">Enfermeiro Caps</option>
+                                        <option value="medicocaps">Médico Caps</option>
+                                      </>
+                                    )
+                                  }
+                                  {
+                                    (role === "coordenadorfarmacia" || role === "admin") && (
+                                      <>
+                                        <option value="coordenadorfarmacia">Coordenador Farmácia</option>
+                                        <option value="administrativofarmacia">Administrador Farmacia</option>
+                                        <option value="farmaceuticofarmacia">Farmaceutico Farmacia</option>
+                                        <option value="enfermeirofarmacia">Enfermeiro Farmácia</option>
+                                        <option value="medicofarmacia">Médico Farmácia</option>
+                                      </>
+                                    )
+                                  }
                                 </select>
                                 {
                                   errors.paciente && <p className="text-red-500 text-xs italic">Por favor selecione um paciente</p>

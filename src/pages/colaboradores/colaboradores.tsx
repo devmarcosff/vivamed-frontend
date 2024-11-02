@@ -44,8 +44,8 @@ export default function ListaColaboradores() {
           </button>
         </div>
 
-        <div className="py-3">
-          <div className="overflow-x-auto py-3">
+        {
+          cidadao.length ? (
             <table className="table-auto w-full">
               <thead>
                 <tr>
@@ -57,7 +57,7 @@ export default function ListaColaboradores() {
               </thead>
               <tbody className='text-sm h-[100px]'>
                 {
-                  cidadao.map((item: any, index: any) => {
+                  cidadao && cidadao.map((item: any, index: any) => {
                     moment.locale('pt')
                     return (
                       <tr className="border-b border-slate-300" key={index}>
@@ -75,9 +75,13 @@ export default function ListaColaboradores() {
                 }
               </tbody>
             </table>
-          </div>
-        </div>
-      </div>
+          ) : (
+            <div className='bg-cyan-50 py-6 border-white text-center'>
+              <span className='font-semibold text-gray-600'>Não existe consultas cadastrada</span>
+            </div>
+          )
+        }
+      </div >
 
       <ModalColaborador openModal={open} closeModal={setOpen} senhaCidadao={senhaCidadao} />
     </>

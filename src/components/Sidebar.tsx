@@ -1,12 +1,15 @@
 "use client"
 import Cookie from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
-import { BriefcaseMedical, ChevronDown, ChevronFirst, ChevronLast, ChevronUp, LayoutDashboard, Stethoscope, Users } from 'lucide-react';
+import { BriefcaseMedical, ChevronDown, ChevronFirst, ChevronLast, ChevronUp, LayoutDashboard, Package, Stethoscope, Users } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
 import { createContext, useContext, useEffect, useState } from "react";
+import { ImProfile } from 'react-icons/im';
 import logo from '../assets/vivamed.svg';
 import Dropdown from "./Dropdown";
+import getCookie from './getCookie';
+import types from './types/roles.t';
 
 const SidebarContext = createContext<any>(true)
 export const SidebarDropdown = createContext<any>(null)
@@ -19,16 +22,18 @@ interface CadastroCidadao {
 
 // SIDEBAR
 export function Sidebar({ children }: string | any) {
-  const [expanded, setExpanded] = useState(Boolean)
+  const [expanded, setExpanded] = useState<boolean>(true)
   const [user, setUser] = useState<CadastroCidadao | undefined>()
-  const token = Cookie.get('accessToken');
 
   useEffect(() => {
+    const isDesktop = window.innerWidth >= 858;
+    setExpanded(isDesktop)
     // Verifica se está no lado do cliente
     if (typeof window !== 'undefined') {
       const token = Cookie.get('accessToken');
       if (token) {
         const decoded = jwtDecode<CadastroCidadao>(`${token}`)
+        Cookie.set('authRole', decoded.role);
         setUser(decoded);
       }
     }
@@ -36,7 +41,7 @@ export function Sidebar({ children }: string | any) {
 
   return (
     <aside className={`h-screen z-10`} >
-      <nav className={`flex flex-col absolute transition-all duration-500 border-r shadow-sm bg-white md:h-full
+      <nav className={`flex flex-col overflow-hidden absolute transition-all duration-500 border-r shadow-sm bg-white md:h-full
           ${expanded ? 'h-full w-full md:relative md:w-64' : 'h-16 w-full md:relative md:w-[66px]'}
         `}>
         <div className="p-4 pb-2 flex justify-between items-center">
@@ -72,17 +77,17 @@ export function SidebarItem({ icon, text, active, alert, subMenu, children, url 
   const [clickMenu, setClickMenu] = useState<boolean>(false)
 
   return (
-    <li onClick={() => {
-      if (subMenu == true && expanded == false) {
-        setExpanded(!expanded)
-      }
-      if (subMenu) setClickMenu(!clickMenu)
-    }} className={`
+    <Link href={`${url ? url : '#'}`}>
+      <li onClick={() => {
+        if (subMenu == true && expanded == false) {
+          setExpanded(!expanded)
+        }
+        if (subMenu) setClickMenu(!clickMenu)
+      }} className={`
     relative py-2 px-3 my-2 font-medium rounded-md border-l-4 border-cyan-200 shadow cursor-pointer hover:translate-x-2 transition-all group text-gray-600
     ${clickMenu ? 'bg-gradient-to-tl from-cyan-200 to-cyan-100 text-cyan-800 hover:-translate-x-0' : ''}
     ${active ? 'bg-gradient-to-tl from-cyan-200 to-cyan-100 text-cyan-800' : 'hover:bg-cyan-50 hover:shadow-lg '}
     `}>
-      <Link href={`${url ? url : '#'}`}>
         <div className="flex items-center">
           {icon}
           <span className={`overflow-hidden transition-all ${expanded ? 'w-52 ml-3' : 'w-0'}`}>{text}</span>
@@ -93,8 +98,8 @@ export function SidebarItem({ icon, text, active, alert, subMenu, children, url 
           {!expanded && <div className={`absolute left-full rounded-md px-2 py-1 ml-6 bg-cyan-100 text-cyan-800 text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}>{text}</div>}
         </div>
         {expanded && <div className={`${clickMenu ? 'flex py-2 my-1' : 'hidden'} mr-2 transition-all`}>{children}</div>}
-      </Link>
-    </li>
+      </li>
+    </Link>
   )
 }
 
@@ -114,15 +119,34 @@ export const SidebarSubmenu = ({ name, url, icon }: any) => {
 
 // SIDEBAR MOUNT
 export const SidebarTrue = () => {
+  const [role, setRole] = useState<any>();
+  const typeRole = types()
+  // Capturando o cookie authRole
+  useEffect(() => {
+    const isRole = getCookie()
+
+    setRole(isRole)
+  }, []);
+
   return (
     // PARA ADICIONAR UM SUBMENU, VOCÊ DEVE PASSAR O SEU COMPONENTE COMO CHILDREN(FILHO)
     // JUNTO COM OS SEUS PARAMETROS => params: { name, url, icon }
     <Sidebar>
+      {/* Funções Geral - Qualquer um pode acessar */}
       <SidebarItem icon={<LayoutDashboard size={20} />} text="Dashboard" url={'/'} />
       <SidebarItem icon={<Users size={20} />} text="Pacientes" url={'/cadastrar_cidadao'} />
-      <SidebarItem icon={<Stethoscope size={20} />} text="Consultas" url={'/consultas'} />
-      <SidebarItem icon={<BriefcaseMedical size={20} />} text="Colaboradores" url={'/colaboradores'} />
-      {/* <hr className="my-3" /> */}
+      {/* Funções Caps - Só o caps acessa*/}
+      {(role === "admin" || role === "medicocaps" || role === "enfermeirocaps" || role === "farmaceuticocaps" || role === "coordenadorcaps" || role === "administrativocaps") && <SidebarItem icon={<Stethoscope size={20} />} text="Consultas" url={'/consultas'} />}
+
+      {/* Funções Farmacia - Só a farmácia acessa */}
+      {(role === "admin" || role === "coordenadorfarmacia" || role === "farmaceuticofarmacia" || role === "administrativofarmacia") && <hr className="my-3" />}
+      {(role === "admin" || role === "medicofarmacia" || role === "farmaceuticofarmacia" || role === "coordenadorfarmacia" || role === "farmaceuticofarmacia" || role === "administrativofarmacia") && <SidebarItem icon={<Package size={20} />} text="Estoque" url={'/estoque'} />}
+
+      {/* Separação entre linha - Qualquer um pode acessar */}
+      <hr className="my-3" />
+      {(role === "admin" || role === "coordenadorcaps" || role === "coordenadorfarmacia" || role === "administrativo") && <SidebarItem icon={<BriefcaseMedical size={20} />} text="Colaboradores" url={'/colaboradores'} />}
+      <SidebarItem icon={<ImProfile size={20} />} text="Perfil" url={'/perfil'} />
+
       {/* <SidebarItem icon={<UserCircle size={20} />} text="Estatística" />
       <SidebarItem icon={<Package size={20} />} text="Estoque" /> */}
       {/* <SidebarItem icon={<Boxes size={20} />} text="Farmácia" subMenu>

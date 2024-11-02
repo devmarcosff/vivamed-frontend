@@ -26,33 +26,32 @@ export default function Login() {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<Inputs>()
   const { push } = useRouter()
 
-  const onSubmit: SubmitHandler<Inputs> = ({ username, password }) => {
+  const onSubmit: SubmitHandler<Inputs> = async ({ username, password }) => {
     // // AUTENTICAÇÃO DE USUÁRIO *TROCAR A URL DA .ENV*
-    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
       username: username,
       password: password
     }).then(res => {
-      setLoading(true)
       setCookie(null, 'accessToken', res.data.access_token)
-      setTimeout(() => {
-        toast.success('Estamos te conectando...', {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        push('/')
-      }, 1000);
+      toast.success('Usuário conectado', {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      push('/')
+      axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/user/active/${username}`, {})
+        .then()
+        .catch(e => alert('Aconteceu algum erro ao atualizar a ativação do usuário.'))
     }).catch(err => {
-      setLoading(true)
       toast.error('Usuário ou senha inválido.', {
         position: "bottom-right",
         autoClose: 5000,
@@ -63,10 +62,6 @@ export default function Login() {
         progress: undefined,
         theme: "light",
       });
-    }).finally(() => {
-      setTimeout(() => {
-        setLoading(false)
-      }, 1000);
     })
   }
 
@@ -79,7 +74,6 @@ export default function Login() {
             <Image className="w-12 flex my-5" alt="Background Login" src={logo} />
             <h2 className="text-lg font-bold text-slate-700" >Bem vindo ao Vivamed</h2>
             <p className="text-sm font-light text-slate-700">Faça login na sua conta</p>
-            {/* <p className="text-xs font-light text-slate-700">Insira seus dados para fazer login.</p> */}
           </div>
 
           <div className="w-full md:w-2/3">
@@ -124,8 +118,8 @@ export default function Login() {
                 </button>
               </div> */}
               <div className="flex items-center justify-between">
-                <button disabled={loading} className="w-full flex items-center justify-center p-2 rounded-lg text-sm bg-cyan-800 text-white font-semibold shadow-xl hover:shadow-none hover:translate-y-0.5 hover:bg-cyan-700 transition-all" type="submit">
-                  {loading ? <ImSpinner2 className='animate-spin text-lg text-center' /> : "Acessar conta"}
+                <button disabled={isSubmitting} className="w-full flex items-center justify-center p-2 rounded-lg text-sm bg-cyan-800 text-white font-semibold shadow-xl hover:shadow-none hover:translate-y-0.5 hover:bg-cyan-700 transition-all" type="submit">
+                  {isSubmitting ? <ImSpinner2 className='animate-spin text-lg text-center' /> : "Acessar conta"}
                 </button>
               </div>
             </form>
