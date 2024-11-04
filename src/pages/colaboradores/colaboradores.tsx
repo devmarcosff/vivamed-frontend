@@ -3,11 +3,12 @@
 import ModalColaborador from '@/components/cadastrar_colaboradores.modal';
 import axios from "axios";
 import Cookie from 'js-cookie';
-import { CircleFadingPlus, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 import moment from 'moment';
 import 'moment/locale/pt';
 import Link from 'next/link';
 import { useEffect, useState } from "react";
+import { BsClipboardPlusFill } from "react-icons/bs";
 
 export default function ListaColaboradores() {
   const [cidadao, setCidadao] = useState<any>([])
@@ -39,7 +40,7 @@ export default function ListaColaboradores() {
               setSenhaCidadao(Math.floor(1000 + Math.random() * 9000))
             }}
             className="bg-cyan-800 hover:bg-cyan-700 text-white transition-all shadow-md font-medium px-3 py-1 rounded-lg flex items-center gap-2">
-            <CircleFadingPlus size={20} />
+            <BsClipboardPlusFill size={20} />
             Novo colaborador
           </button>
         </div>

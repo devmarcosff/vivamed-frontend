@@ -4,11 +4,12 @@ import CadastrarConsulta from '@/components/cadastrar_consulta.modal';
 import { isNotCaps } from '@/components/types/routes.t';
 import axios from "axios";
 import Cookie from 'js-cookie';
-import { CircleFadingPlus } from "lucide-react";
 import moment from 'moment';
 import 'moment/locale/pt';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
+import { BsClipboardPlusFill } from "react-icons/bs";
+import { FiAlertTriangle } from 'react-icons/fi';
 import './style.css';
 
 export default function Consultation() {
@@ -38,16 +39,28 @@ export default function Consultation() {
   return (
     <>
       <div className="bg-white my-2 shadow-md rounded-md p-5 w-full max-h-full overflow-auto">
-        <div className="flex justify-between items-center w-full top-0 pb-3">
+        <div className="flex flex-col lg:flex-row justify-between items-center w-full top-0 pb-3 gap-3">
           <h2 className='font-semibold'>Consultas realizadas</h2>
-          <button
-            onClick={() => {
-              setOpen(true)
-            }}
-            className="bg-cyan-800 hover:bg-cyan-700 text-white transition-all shadow-md font-semibold px-3 py-1 rounded-lg flex items-center gap-2">
-            <CircleFadingPlus size={20} />
-            Nova consulta
-          </button>
+          <div className='flex gap-3 w-full md:w-[500px] h-[40px]'>
+            <button
+              onClick={() => {
+                setOpen(true)
+              }}
+              className="bg-orange-500 hover:bg-orange-400 capitalize text-white transition-all shadow-md font-semibold px-3 py-1 rounded-lg flex items-center gap-2 w-full text-center justify-center">
+              <FiAlertTriangle size={20} />
+              <span className='hidden md:flex'>Consulta de urgência</span>
+              <span className='flex md:hidden'>urgência</span>
+            </button>
+            <button
+              onClick={() => {
+                setOpen(true)
+              }}
+              className="bg-cyan-800 hover:bg-cyan-700 text-white transition-all shadow-md font-semibold px-3 py-1 rounded-lg flex items-center gap-2 w-full text-center justify-center">
+              <BsClipboardPlusFill size={20} />
+              <span className='hidden md:block'>Agendar consulta</span>
+              <span className='block md:hidden'>Agendar</span>
+            </button>
+          </div>
         </div>
 
         {

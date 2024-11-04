@@ -3,10 +3,10 @@
 import ModalCidadao from '@/components/cadastrar_cidadao.modal';
 import axios from "axios";
 import Cookie from 'js-cookie';
-import { CircleFadingPlus } from "lucide-react";
 import moment from 'moment';
 import 'moment/locale/pt';
 import { useEffect, useState } from "react";
+import { BsClipboardPlusFill } from "react-icons/bs";
 
 export default function ListarCidadao() {
   const [cidadao, setCidadao] = useState<any>([])
@@ -42,7 +42,7 @@ export default function ListarCidadao() {
               setSenhaCidadao(Math.floor(1000 + Math.random() * 9000))
             }}
             className="bg-cyan-800 hover:bg-cyan-700 text-white transition-all shadow-md font-semibold px-3 py-1 rounded-lg flex items-center gap-2">
-            <CircleFadingPlus size={20} />
+            <BsClipboardPlusFill size={20} />
             Novo paciente
           </button>
         </div>
