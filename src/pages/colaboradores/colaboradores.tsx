@@ -30,7 +30,7 @@ export default function ListaColaboradores() {
     <>
       <div className="bg-white my-2 shadow-md rounded-md p-5 w-full max-h-full overflow-auto">
         <div className="flex flex-col lg:flex-row justify-between items-center w-full top-0 pb-3 gap-3">
-          <h2 className='font-semibold'>Consultas realizadas</h2>
+          <h2 className='font-semibold'>Colaboradores</h2>
           <button
             onClick={() => {
               setOpen(true)

@@ -19,10 +19,6 @@ export default function agendarConsulta() {
   const [agenda, setAgenda] = useState(false)
   const token = Cookie.get('accessToken')
 
-  const handleNavigate = (id: any) => {
-    router.push(`/consultas/${id}`);
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/agendasconsulta`, {
@@ -66,10 +62,10 @@ export default function agendarConsulta() {
                     <th className='py-5 px-2 text-wrap'>Data da consulta</th>
                     <th className='py-5 px-2 text-wrap'>Hora da consulta</th>
                     <th className='py-5 px-2'>Recorrente</th>
-                    {/* <th className='py-5 px-2'>Téc Responsável</th> */}
+                    <th className='py-5 px-2'>Téc. de Referência</th>
                   </tr>
                 </thead>
-                <tbody className='text-sm h-[120px] text-center'>
+                <tbody className='text-sm text-center'>
                   {
                     agendaConsulta.map((item: any, index: any) => {
                       moment.locale('pt')
@@ -82,7 +78,7 @@ export default function agendarConsulta() {
                           <td className="py-3 text-center max-w-44 truncate">{!!item.dataconsulta && moment(item.dataconsulta).format("DD/MM/YYYY") || "-"}</td>
                           <td className="py-3 text-center max-w-44 truncate">{item.horaconsulta || "-"}</td>
                           <td className="py-3 text-center max-w-44 truncate">{item.recorrente == true ? 'Sim' : 'Não'}</td>
-                          {/* <td className="py-3 text-center max-w-44 truncate">{item.tecResponsavel || "Não informado"}</td> */}
+                          <td className="py-3 text-center max-w-44 truncate">{item.tecResponsavel || "Não informado"}</td>
                         </tr>
                       )
                     })

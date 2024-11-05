@@ -63,10 +63,11 @@ export default function Consultation() {
                     <th className='py-5 px-2'>Prontuário</th>
                     <th className='py-5 px-2'>Paciente</th>
                     <th className='py-5 px-2 text-wrap'>Data da consulta</th>
+                    <th className='py-5 px-2 text-wrap'>Medicamento</th>
                     <th className='py-5 px-2'>Resp. Técnico</th>
                   </tr>
                 </thead>
-                <tbody className='text-sm h-[120px] text-center py-5'>
+                <tbody className='text-sm text-center py-5'>
                   {
                     cidadao.map((item: any, index: any) => {
                       moment.locale('pt')
@@ -77,6 +78,7 @@ export default function Consultation() {
                             <td className="py-3 text-center group-hover/item:underline group-hover/item:text-cyan-500">{item.paciente || "-"}</td>
                           </Link>
                           <td className="py-3 text-center max-w-44 truncate">{!!item.createAt && moment(item.createAt).format("DD/MM/YYYY - HH:mm") || "-"}</td>
+                          <td className="py-3 text-center max-w-44 truncate">{item.medicamentos.length ? 'Sim' : 'Não'}</td>
                           <td className="py-3 text-center max-w-44 truncate">{item.respTec || "-"}</td>
                         </tr>
                       )
