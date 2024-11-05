@@ -10,6 +10,7 @@ import { ImSpinner2 } from "react-icons/im";
 import { toast } from 'react-toastify';
 
 interface CadastroCidadao {
+  id: string,
   name: string,
   role: string,
   idProf: string
@@ -79,7 +80,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
   const createCidadao = async (data: any) => {
     var consulta = {
       "prontuario": data.prontuario,
-      "respTec": data.respTec,
+      "respTec": user?.id,
       "role": data.role,
       "idProf": data.idProf,
       "descricao": data.descricao
@@ -153,7 +154,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
         <div className="flex min-h-full justify-center p-4 text-center items-center sm:p-0">
           <DialogPanel
             transition
-            className={`relative transform overflow-hidden rounded-lg bg-white w-full text-left shadow-xl transition-all data-[closed]:translate-y-40 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full ${consulta ? 'sm:max-w-[40%]' : 'sm:max-w-[80%]'} data-[closed]:sm:translate-y-10 data-[closed]:sm:scale-95`}>
+            className={`relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-40 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 w-full ${consulta ? 'sm:max-w-[40%]' : 'sm:max-w-[80%]'} data-[closed]:sm:translate-y-10 data-[closed]:sm:scale-95`}>
             <div className={`flex flex-col sm:h-full overflow-y-auto`}>
               <div>
                 <div className='flex h-full items-center justify-between p-3 bg-cyan-800 sm:shadow sm:bg-white sm:text-gray-600'>
@@ -288,7 +289,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             Responsável técnico *
                           </label>
                           {user && (
-                            <input {...register('respTec',)} value={user.name} className={`${errors.respTec && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-500 font-semibold border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            <input value={user.name} className={`${errors.respTec && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-500 font-semibold border rounded py-3 px-4 leading-tight focus:outline-none`} id="grid-first-name" type="text" />
                           )}
                           {
                             errors.respTec && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
@@ -299,7 +300,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             Cargo *
                           </label>
                           {user && (
-                            <input {...register('role')} value={user.role} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-500 font-semibold capitalize border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            <input {...register('role')} value={user.role} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-500 font-semibold capitalize border rounded py-3 px-4 leading-tight focus:outline-none`} id="grid-first-name" type="text" />
                           )}
                           {
                             errors.role && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
@@ -310,7 +311,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
                             Id. Profissional *
                           </label>
                           {user && (
-                            <input {...register('idProf')} value={user.idProf} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-500 font-semibold border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="grid-first-name" type="text" />
+                            <input {...register('idProf')} value={user.idProf} className={`${errors.role && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-500 font-semibold border rounded py-3 px-4 leading-tight focus:outline-none`} id="grid-first-name" type="text" />
                           )}
                           {
                             errors.idProf && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>

@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { Urbanist } from "next/font/google";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import 'rsuite/Button/styles/index.css';
 import "./globals.css";
 
 
