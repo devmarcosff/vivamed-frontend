@@ -168,8 +168,8 @@ export default function AgendarConsulta({ openAgenda, closeAgenda }: any) {
                         Usuário recorrente
                       </label>
                       <select {...register('recorrente')} name="recorrente" id="recorrente" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
-                        <option value={String(false)}>Não</option>
-                        <option value={String(true)}>Sim</option>
+                        <option value={`${false}`}>Não</option>
+                        <option value={`${true}`}>Sim</option>
                       </select>
                       {
                         errors.recorrente && <p className="text-red-500 text-xs italic">Por favor selecione um colaborador</p>

@@ -17,7 +17,7 @@ const DrawerContent: React.FC<DrawerContentProps> = ({ children, className, ...p
       <DialogPrimitive.Content
         onInteractOutside={(event) => event.preventDefault()}
         className={clsx(
-          'fixed top-0 right-0 z-20 h-full w-full flex flex-col pl-14 py-14',
+          'fixed top-0 right-0 z-20 h-full w-full flex flex-col pl-5 py-5 sm:pl-10 sm:py-10',
           'md:rounded-lg sm:w-3/4 2xl:w-3/6 transition-[width] outline-none',
           'bg-allintra-gray-300 animate-transformLeft',
           className
@@ -29,7 +29,7 @@ const DrawerContent: React.FC<DrawerContentProps> = ({ children, className, ...p
         >
           <Image alt='' src={CloseIcon} className="w-5 h-5" />
         </DialogPrimitive.Close>
-        <div id="dialog-content" className="mt-3 pr-14 scrollbar-track-transparent overflow-y-auto h-full">
+        <div id="dialog-content" className="mt-3 pr-5 sm:pr-10 scrollbar-track-transparent overflow-y-auto h-full">
           {children}
         </div>
       </DialogPrimitive.Content>

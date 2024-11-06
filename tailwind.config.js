@@ -14,8 +14,8 @@ module.exports = withMT({
       colors: {
         allintra: {
           primary: {
-            500: '#E71C79',
-            700: '#B6286F',
+            50: '#e0f7fa',
+            500: '#00bcd4'
           },
           black: {
             500: '#0A0F1D',
