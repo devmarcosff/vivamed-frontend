@@ -28,10 +28,11 @@ export default function AgendarConsulta({ openAgenda, closeAgenda }: any) {
   const agendarConsulta = async (data: any) => {
     var consulta = {
       "prontuario": data.prontuario,
-      "tecResponsavel": data.tecResponsavel,
+      "idTecResponsavel": data.idTecResponsavel,
       "horaconsulta": data.horaconsulta,
       "dataconsulta": data.dataconsulta,
-      "recorrente": data.recorrente
+      "recorrente": data.recorrente,
+      "status": "Agendado"
     }
 
     await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/agendasconsulta`, consulta, {
@@ -131,10 +132,10 @@ export default function AgendarConsulta({ openAgenda, closeAgenda }: any) {
                       }
                     </div>
                     <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="tecResponsavel">
+                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="idTecResponsavel">
                         Responsável técnico *
                       </label>
-                      <select {...register('tecResponsavel')} name="tecResponsavel" id="tecResponsavel" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
+                      <select {...register('idTecResponsavel')} name="idTecResponsavel" id="idTecResponsavel" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
                         <option value="">Selecione um colaborador</option>
                         {
                           colaborador.map((item: any, index: any) => <option value={item.id} key={index}>{item.name}</option>)

@@ -19,7 +19,6 @@ export default function Consultation() {
           <ConsultationList />
         </div>
       </div>
-
     </div>
   );
 }
