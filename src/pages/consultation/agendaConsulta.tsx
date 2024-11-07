@@ -8,13 +8,15 @@ import axios from "axios";
 import Cookie from 'js-cookie';
 import moment from 'moment';
 import 'moment/locale/pt';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from "react";
-import { BsClipboardPlusFill } from "react-icons/bs";
 import { FiAlertCircle } from 'react-icons/fi';
 import { IoMdPrint } from 'react-icons/io';
-import { MdModeEditOutline } from 'react-icons/md';
+import { MdDateRange, MdModeEditOutline } from 'react-icons/md';
+import { toast } from 'react-toastify';
 import './style.css';
+
+
 
 interface IConsulta {
   createAt?: string
@@ -30,7 +32,6 @@ interface IConsulta {
 }
 
 export default function agendarConsulta() {
-  const router = useRouter();
   const pathname = usePathname();
   const [drawer, setDrawer] = useState(false)
   const [consulta, setConsulta] = useState<IConsulta>()
@@ -57,35 +58,65 @@ export default function agendarConsulta() {
     setConsulta(detalheconsulta)
   }
 
+  const cancelarAgendamento = async (id: string) => {
+    await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/agendasconsulta/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).then(e => {
+      toast.success(`${e.data}`, {
+        position: "bottom-right",
+        autoClose: 2500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setDrawer(!drawer)
+    }).catch(e => {
+      toast.error(`${e.data}`, {
+        position: "bottom-right",
+        autoClose: 2500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+    )
+  }
+
   return (
     <>
-      <div className="bg-white my-2 shadow-md rounded-md p-5 w-full max-h-full">
-        <div className="flex flex-col lg:flex-row justify-between items-start sm:items-center w-full top-0 pb-3 gap-3">
-          <h2 className='font-semibold'>Consultas agendadas</h2>
-          <div className='flex gap-3 h-[40px] w-full sm:w-[initial]'>
+      <div className="bg-white my-3 shadow-md rounded-md w-full max-h-full overflow-auto relative">
+        <div className="flex lg:flex-row justify-between items-center w-full top-0 p-5 gap-3 sticky bg-white shadow-sm z-10">
+          <h2 className='font-semibold w-full sm:w-[initial]'>Consultas agendadas</h2>
+          <div className='flex gap-3 w-full sm:w-[initial]'>
             <button
               onClick={() => {
                 setAgenda(true)
               }}
-              className="bg-cyan-800 hover:bg-cyan-700 text-white transition-all shadow-md font-semibold px-3 py-1 rounded-lg flex items-center gap-2 w-full text-center justify-center">
-              <BsClipboardPlusFill size={20} />
-              <span className='hidden md:block'>Agendar consulta</span>
-              <span className='block md:hidden'>Agendar</span>
+              className='px-3 py-2 w-full text-allintra-primary-50 bg-allintra-primary-800 hover:bg-cyan-700 transition-all text-sm font-semibold shadow-md rounded-md flex gap-3 items-center justify-center'>
+              <MdDateRange size={20} />
+              <span>Agendar consulta</span>
             </button>
           </div>
         </div>
 
         {
           agendaConsulta.length ? (
-            <div className='overflow-auto rounded-md shadow-sm'>
+            <div className='overflow-auto rounded-md shadow-sm m-3 mb-10'>
               <table className="table-auto w-full">
                 <thead className='bg-cyan-50 border-b-2 border-white'>
                   <tr>
-                    {/* <th className='py-5 px-2'>Prontuário</th> */}
+                    <th className='py-5 px-2'>Prontuário</th>
                     <th className='py-5 px-2'>Paciente</th>
                     <th className='py-5 px-2 text-wrap'>Data da consulta</th>
                     <th className='py-5 px-2 text-wrap'>Hora da consulta</th>
-                    {/* <th className='py-5 px-2'>Recorrente</th> */}
                     <th className='py-5 px-2'>Status</th>
                     <th className='py-5 px-2'>Téc. de Referência</th>
                   </tr>
@@ -96,7 +127,7 @@ export default function agendarConsulta() {
                       moment.locale('pt')
                       return (
                         <tr key={index} className={`animate-fadeIn group/item border-b border-slate-300 last:border-0 hover:bg-cyan-50 transition-all cursor-pointer`} onClick={() => detalhesConsulta(item)}>
-                          {/* <th className="py-3 text-center max-w-44 truncate cursor-pointer">{item.prontuario || "-"}</th> */}
+                          <th className="py-3 text-center max-w-44 truncate cursor-pointer">{item.prontuario || "-"}</th>
                           <td className="px-3 py-3 text-center group-hover/item:underline group-hover/item:text-cyan-500 text-nowrap truncate max-w-[120px]">{!!item.paciente && item.paciente || "-"}</td>
                           <td className="py-3 text-center max-w-44 truncate">{!!item.dataconsulta && moment(item.dataconsulta).format("DD/MM/YYYY") || "-"}</td>
                           <td className="py-3 text-center max-w-44 truncate">{item.horaconsulta || "-"}</td>
@@ -116,7 +147,7 @@ export default function agendarConsulta() {
               </table>
             </div>
           ) : (
-            <div className='bg-cyan-50 py-5 border-white text-center'>
+            <div className='bg-cyan-50 py-5 border-white text-center m-3 rounded-md shadow-sm'>
               <span className='font-semibold text-gray-600'>Não existe consultas agendadas</span>
             </div>
           )
@@ -175,7 +206,7 @@ export default function agendarConsulta() {
                 <div className="w-full md:w-1/2 px-3 my-2">
                   <span className='text-allintra-gray-700 text-sm'>Recorrente</span>
                   <div className='text-gray-800'>
-                    <span>Sim</span>
+                    <span>{consulta?.recorrente == true ? 'Sim' : 'Não'}</span>
                   </div>
                 </div>
                 <div className="w-full md:w-1/2 px-3 my-2">
@@ -190,7 +221,7 @@ export default function agendarConsulta() {
             <div className='flex justify-between items-center w-full gap-3 bg-allintra-gray-300 px-4 py-2 sticky bottom-0 left-0'>
               <span className='text-allintra-gray-500 text-sm truncate w-full'>{consulta?.id}</span>
               <div className='flex gap-3'>
-                <button className='px-3 py-1 text-allintra-error-50 bg-red-400 hover:bg-red-300 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => alert('Cancelar Consulta')}>Cancelar</button>
+                <button className='px-3 py-1 text-allintra-error-50 bg-red-400 hover:bg-red-300 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => cancelarAgendamento(`${consulta?.id}`)}>Deletar</button>
                 <button className='px-3 py-1 text-allintra-attention-50 bg-orange-400 hover:bg-orange-300 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => alert('Editar Consulta')}>Remarcar</button>
               </div>
             </div>

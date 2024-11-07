@@ -40,7 +40,7 @@ export function Sidebar({ children }: string | any) {
   }, []);
 
   return (
-    <aside className={`h-screen z-10`} >
+    <aside className={`z-20`} >
       <nav className={`flex flex-col overflow-hidden absolute transition-all duration-500 border-r shadow-sm bg-white md:h-full
           ${expanded ? 'h-full w-full md:relative md:w-64' : 'h-16 w-full md:relative md:w-[66px]'}
         `}>
@@ -106,14 +106,16 @@ export function SidebarItem({ icon, text, active, alert, subMenu, children, url 
 // SIDEBAR SUBMENU
 export const SidebarSubmenu = ({ name, url, icon }: any) => {
   return (
-    <ul className="py-1 w-full space-y-2">
-      <li className="hover:translate-x-2 bg-white rounded-lg border-cyan-200 border-l-4 shadow-md transition-all">
-        <Link href={url} className="flex items-center gap-3 w-full p-2 transition duration-75">
-          {icon}
-          {name}
-        </Link>
-      </li>
-    </ul>
+    <>
+      <ul className="py-1 w-full space-y-2">
+        <li className="hover:translate-x-2 bg-white rounded-lg border-cyan-200 border-l-4 shadow-md transition-all">
+          <Link href={url} className="flex items-center gap-3 w-full p-2 transition duration-75">
+            {icon}
+            {name}
+          </Link>
+        </li>
+      </ul>
+    </>
   )
 }
 
@@ -135,8 +137,11 @@ export const SidebarTrue = () => {
       {/* Funções Geral - Qualquer um pode acessar */}
       <SidebarItem icon={<LayoutDashboard size={20} />} text="Dashboard" url={'/'} />
       <SidebarItem icon={<Users size={20} />} text="Pacientes" url={'/cadastrar_cidadao'} />
+
       {/* Funções Caps - Só o caps acessa*/}
-      {(role === "admin" || role === "medicocaps" || role === "enfermeirocaps" || role === "farmaceuticocaps" || role === "coordenadorcaps" || role === "administrativocaps") && <SidebarItem icon={<Stethoscope size={20} />} text="Consultas" url={'/consultas'} />}
+      {(role === "admin" || role === "coordenadorfarmacia" || role === "farmaceuticofarmacia" || role === "administrativofarmacia") && <hr className="my-3" />}
+      {(role === "admin" || role === "medicocaps" || role === "enfermeirocaps" || role === "farmaceuticocaps" || role === "coordenadorcaps" || role === "administrativocaps") && <SidebarItem icon={<Stethoscope size={20} />} text="Consultar" url={'/consultas'} />}
+      {(role === "admin" || role === "medicocaps" || role === "enfermeirocaps" || role === "farmaceuticocaps" || role === "coordenadorcaps" || role === "administrativocaps") && <SidebarItem icon={<Stethoscope size={20} />} text="Agendar" url={'/agendar'} />}
 
       {/* Funções Farmacia - Só a farmácia acessa */}
       {(role === "admin" || role === "coordenadorfarmacia" || role === "farmaceuticofarmacia" || role === "administrativofarmacia") && <hr className="my-3" />}
@@ -159,6 +164,13 @@ export const SidebarTrue = () => {
       {/* <hr className="my-3" />
       <SidebarItem icon={<Settings size={20} />} text="Configuração" url={'/config'} /> */}
       {/* <SidebarItem icon={<LifeBuoy size={20} />} text="Ajuda" /> */}
+      {/* <SidebarItem icon={<Boxes size={20} />} text="Farmácia" subMenu>
+        <div className="flex-col">
+        </div> */}
+      {/* <div className="flex-col">
+          <SidebarSubmenu name="Listar medicamentos" url="/listar_medicamento" icon={<CirclePlus size={20} />} />
+        </div> */}
+      {/* </SidebarItem> */}
     </Sidebar>
   )
 }

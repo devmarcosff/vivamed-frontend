@@ -23,6 +23,8 @@ export default function RootLayout({
       <body className={`${urbanist.className} bg-cyan-50 overflow-x-hidden`}>
         {children}
         <ToastContainer />
+
+        <script src="./node_modules/preline/dist/preline.js"></script>
       </body>
     </html>
   );

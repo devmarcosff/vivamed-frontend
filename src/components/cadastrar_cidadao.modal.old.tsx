@@ -236,7 +236,7 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
                             Frequencia do usuário *
                           </label>
                           <select {...register('frequencia')} name="frequencia" id="frequencia" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
-                            <option value="">Selecione uma frequencia</option>
+                            <option value="NAO-INTENSIVO">Selecione uma frequencia</option>
                             <option value="INTENSIVO">INTENSIVO</option>
                             <option value="SEMI-INTENSIVO">SEMI-INTENSIVO</option>
                             <option value="NAO-INTENSIVO">NAO-INTENSIVO</option>

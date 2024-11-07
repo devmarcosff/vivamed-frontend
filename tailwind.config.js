@@ -5,6 +5,7 @@ module.exports = withMT({
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    'node_modules/preline/dist/*.js',
 
     // Or if using `src` directory:
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
@@ -15,7 +16,9 @@ module.exports = withMT({
         allintra: {
           primary: {
             50: '#e0f7fa',
-            500: '#00bcd4'
+            500: '#00bcd4',
+            700: '#0097a7',
+            800: '#00838f'
           },
           black: {
             500: '#0A0F1D',
@@ -104,6 +107,8 @@ module.exports = withMT({
       },
     }
   },
-  plugins: [],
+  plugins: [
+    require('preline/plugin'),
+  ],
 })
 
