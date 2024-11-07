@@ -64,6 +64,7 @@ export default function agendarConsulta() {
         Authorization: `Bearer ${token}`
       }
     }).then(e => {
+      setDrawer(!drawer)
       toast.success(`${e.data}`, {
         position: "bottom-right",
         autoClose: 2500,
@@ -74,7 +75,6 @@ export default function agendarConsulta() {
         progress: undefined,
         theme: "light",
       });
-      setDrawer(!drawer)
     }).catch(e => {
       toast.error(`${e.data}`, {
         position: "bottom-right",

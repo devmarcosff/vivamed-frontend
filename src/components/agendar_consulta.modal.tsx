@@ -4,6 +4,7 @@ import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/re
 import axios from 'axios';
 import Cookie from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ImSpinner2 } from "react-icons/im";
@@ -43,7 +44,7 @@ export default function AgendarConsulta({ openAgenda, closeAgenda }: any) {
     }).then(e => {
       closeAgenda(false)
       reset()
-      toast.success(`Consulta agendada com sucesso. Data: ${data.dataconsulta}`, {
+      toast.success(`Consulta agendada com sucesso. Data: ${moment(data.dataconsulta).format("DD/MM/YYYY")}`, {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -176,33 +177,7 @@ export default function AgendarConsulta({ openAgenda, closeAgenda }: any) {
                         errors.recorrente && <p className="text-red-500 text-xs italic">Por favor selecione um colaborador</p>
                       }
                     </div>
-                    {/* <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="name">
-                            Responsável técnico *
-                          </label>
-                          {user && (
-                            <input {...register('respTec',)} value={user.name} className={`${errors.respTec && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-500 font-semibold border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="name" type="text" />
-                          )}
-                          {
-                            errors.respTec && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                          }
-                        </div> */}
                   </div>
-                  {/* <hr className='my-3' />
-                      <h2 className='font-bold text-left'>Adicionar informações a consulta</h2>
-                      <div className="flex flex-wrap -mx-3 my-3 text-left">
-                        <div className="w-full px-3 mb-6 md:mb-0">
-                          <div>
-                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-city">
-                              Informações da consulta
-                            </label>
-                            <textarea rows={10} {...register('descricao', { required: 'Por favor preencha este campo' })} placeholder='Preencha com as informações da consulta realizada.' id="descricao" name="descricao" className={`${errors.descricao && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} />
-                            {
-                              errors.descricao && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                            }
-                          </div>
-                        </div>
-                      </div> */}
 
                   <div className="border-t-[1px] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                     <button
