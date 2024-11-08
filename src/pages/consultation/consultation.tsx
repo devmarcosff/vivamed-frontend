@@ -19,24 +19,47 @@ import { MdModeEditOutline } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import './style.css';
 
+interface cidadao {
+  createAt: string,
+  descricao: string,
+  id: string,
+  paciente: string,
+  prontuario: string,
+  respTec: string,
+  role: string,
+  medicamentos: []
+}
+
 export default function Consultation() {
   const router = useRouter();
   const pathname = usePathname();
   const [consulta, setConsulta] = useState<any>()
-  const [drawer, setDrawer] = useState('fechar')
+  const [drawer, setDrawer] = useState<any>('fechar')
   const [consultas, setConsultas] = useState<any>([])
   const [agendaConsulta, setAgendaConsulta] = useState<any>([])
   const [colaborador, setColaborador] = useState<any>([])
+  const [medicamentos, setMedicamentos] = useState<any>([])
   const [role, setRole] = useState<any>([])
   const [decoded, setDecoded] = useState<any>([])
   const [open, setOpen] = useState(false)
+  const [idsMedicamentos, setIdsMedicamentos] = useState<any>()
   const token = Cookie.get('accessToken')
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm()
 
-  const detalhesConsulta = (detalheconsulta: any) => {
+  const detalhesConsulta = async (detalheconsulta: any) => {
     setDrawer(`${'detalhesconsulta'}`)
     setConsulta(detalheconsulta)
+
+    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/consulta/${detalheconsulta.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).then(e => {
+      setMedicamentos(e.data.medicamentos)
+    }).catch(e => console.log(e))
   }
+
+  const handleOpen = (value: any) => setOpen(open === value ? 0 : value);
 
   const abrirConsulta = () => {
     setDrawer(`${'abrir'}`)
@@ -59,7 +82,8 @@ export default function Consultation() {
     }).then(e => {
       setConsulta(e.data)
       reset()
-      setDrawer(`${'fechar'}`)
+      // setDrawer(`${'fechar'}`)
+      setDrawer(`fechar`)
       toast.success("Consulta inserida com sucesso.", {
         position: "bottom-right",
         autoClose: 5000,
@@ -84,36 +108,94 @@ export default function Consultation() {
     })
   }
 
-  const deletarConsulta = async (id: string) => {
-    await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/consulta/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
+  const deletarConsulta = async (id?: string) => {
+    console.log('Deletando medicamento...')
+    const idsMedicamentos = medicamentos.length > 0 ? medicamentos.map((med: any) => med.id).join(',') : null;
+    if (idsMedicamentos) {
+      try {
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/medicamentos/deletemany/${idsMedicamentos}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }).then(e => {
+          // setDrawer(`${'fechar'}`)
+          toast.success(`${e.data}`, {
+            position: "bottom-right",
+            autoClose: 2500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }).catch(e => {
+          toast.error(`${e.data}`, {
+            position: "bottom-right",
+            autoClose: 2500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        })
+      } catch (err) {
+        console.log('Erro ao excluir medicamento:', err)
       }
-    }).then(e => {
-      setDrawer(`${'fechar'}`)
-      toast.success(`${e.data}`, {
-        position: "bottom-right",
-        autoClose: 2500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-    }).catch(e => {
-      toast.error(`${e.data}`, {
-        position: "bottom-right",
-        autoClose: 2500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
     }
-    )
+    console.log('Aguarde...')
+
+    console.log('Deletando consulta...')
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/consulta/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }).then(e => {
+        // setDrawer(`${'fechar'}`)
+        setDrawer(`fechar`)
+        toast.success(`${e.data}`, {
+          position: "bottom-right",
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }).catch(e => {
+        toast.error(`${e.data}`, {
+          position: "bottom-right",
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      })
+    } catch (err) {
+      console.log('Erro ao excluir consulta:', err)
+    }
+  }
+
+  const Icon = ({ id, open }: any) => {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={2}
+        stroke="currentColor"
+        className={`${id === open ? "rotate-180" : ""} h-3 w-3 transition-transform`}
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+      </svg>
+    );
   }
 
   useEffect(() => {
@@ -142,6 +224,8 @@ export default function Consultation() {
     fetchData()
     isNotCaps(`${pathname}`)
   }, [drawer == 'fechar']);
+
+  console.log(drawer)
 
   return (
     <>
@@ -199,7 +283,7 @@ export default function Consultation() {
         }
       </div >
       {/* Drawer Detalhes da Consulta */}
-      <Drawer.Root open={drawer == 'detalhesconsulta'} onOpenChange={setDrawer}>
+      <Drawer.Root open={drawer == 'detalhesconsulta'} onOpenChange={() => setDrawer('fechar')}>
         <Drawer.Content>
           <DialogTitle>
             <BoxInfo.Root type={`success`} className='mb-3'>
@@ -208,9 +292,9 @@ export default function Consultation() {
             </BoxInfo.Root>
           </DialogTitle>
 
-          <div className='shadow-md bg-white rounded-md overflow-auto border mb-3 h-[85%] flex flex-col justify-between relative'>
-            <div className='h-full'>
-              <div className='flex justify-between items-center p-4 sticky top-0 bg-allintra-white-50 shadow-sm'>
+          <div className='shadow-md bg-white rounded-md overflow-auto border mb-3 h-[88%] flex flex-col justify-between relative'>
+            <div>
+              <div className='flex justify-between items-center p-4 sticky top-0 bg-allintra-white-50 shadow-sm z-10'>
                 <h2 className='font-semibold text-allintra-gray-700'>Consulta inserida</h2>
                 <div className='flex gap-3 items-center'>
                   <button className={`rounded p-2 shadow-sm border text-allintra-gray-700 hover:bg-allintra-gray-300`}>
@@ -224,58 +308,80 @@ export default function Consultation() {
 
               <div className="flex flex-wrap w-full my-0 p-4">
                 <div className="w-full md:w-1/2 px-3 my-2">
-                  <span className='text-allintra-gray-700 text-sm'>Data e Hora</span>
-                  <div className='flex gap-1 text-gray-800'>
-                    <span>{moment(consulta?.dataconsulta).format("DD/MM/YYYY")}</span>
-                  </div>
-                </div>
-                <div className="w-full md:w-1/2 px-3 my-2">
                   <span className='text-allintra-gray-700 text-sm'>Paciente</span>
                   <div className='text-gray-800'>
                     <span>{consulta?.paciente}</span>
                   </div>
                 </div>
                 <div className="w-full md:w-1/2 px-3 my-2">
-                  <span className='text-allintra-gray-700 text-sm'>Status</span>
+                  <span className='text-allintra-gray-700 text-sm'>Data realizada</span>
                   <div className='text-gray-800'>
-                    <span>{consulta?.status}</span>
+                    <span>{moment(consulta?.createAt).format("DD/MM/YYYY")}</span>
                   </div>
                 </div>
                 <div className="w-full md:w-1/2 px-3 my-2">
                   <span className='text-allintra-gray-700 text-sm'>Responsável Técnico</span>
+                  <div className='text-gray-800 flex flex-col'>
+                    <span>{consulta?.respTec}</span>
+                    <span className='text-allintra-gray-600'>@{consulta?.idRespTec}</span>
+                  </div>
+                </div>
+                <div className="w-full md:w-1/2 px-3 my-2">
+                  <span className='text-allintra-gray-700 text-sm'>Hora realizada</span>
                   <div className='text-gray-800'>
-                    <span>{consulta?.tecResponsavel}</span>
+                    <span>{moment(consulta?.createAt).format("HH:mm")}</span>
                   </div>
                 </div>
 
-                <div className="w-full md:w-1/2 px-3 my-2">
-                  <span className='text-allintra-gray-700 text-sm'>Recorrente</span>
-                  <div className='text-gray-800'>
-                    <span>Sim</span>
+                <div className="w-full p-3 my-2 border-t">
+                  <span className="text-allintra-gray-700 text-sm">Anamnese / Exame Clínico</span>
+                  <div className="border p-5 text-gray-800 animate-scaleIn rounded bg-allintra-gray-300 hover:border-allintra-primary-500 w-full break-words whitespace-pre-line">
+                    {consulta?.descricao}
                   </div>
                 </div>
-                <div className="w-full md:w-1/2 px-3 my-2">
-                  <span className='text-allintra-gray-700 text-sm'>Data realizada</span>
-                  <div className='text-gray-800'>
-                    <span>{moment(consulta?.createAt).format("DD/MM/YYYY - HH:mm")}</span>
-                  </div>
-                </div>
+
+                {
+                  medicamentos.length ? (
+                    <div className="w-full p-3 my-2 border-t">
+                      <span className='text-allintra-gray-700 text-sm'>Medicamentos</span>
+                      <div className='text-gray-800 grid sm:grid-cols-4 grid-cols-1 gap-3'>
+                        {
+                          medicamentos.map((item: any, index: any) => (
+                            // <Accordion placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} key={index} className="bg-white my-3 rounded-md px-5 border relative z-0 hover:border-allintra-primary-500 transition-all animate-scaleIn" open={open} icon={<Icon id={item.id} open={open} />}>
+                            //   <AccordionHeader placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} onClick={() => handleOpen(item.id)} className="text-sm font-semibold border-none capitalize">{item.prescricao}</AccordionHeader>
+                            //   <AccordionBody>
+                            //     <p className="capitalize"><span className="font-semibold">Nome:</span> {item.prescricao}</p>
+                            //     <p><span className="font-semibold">Quantidade:</span> {item.quantidade}</p>
+                            //     <p><span className="font-semibold flex flex-col">Tempo de uso:</span> {item.use || '8/8 horas - Uso oral'}</p>
+                            //   </AccordionBody>
+                            // </Accordion>
+                            <ul key={index} className='bg-white rounded-md px-3 py-2 border relative z-0 hover:border-allintra-primary-500 transition-all animate-scaleIn'>
+                              <li className='capitalize font-semibold'>{item.prescricao}</li>
+                              <li>{item.quantidade} un. de {item.use}</li>
+                            </ul>
+                          ))
+                        }
+                      </div>
+                    </div>
+                  ) : ''
+                }
               </div>
             </div>
 
             <div className='flex justify-between items-center w-full gap-3 bg-allintra-gray-300 px-4 py-2 sticky bottom-0 left-0'>
-              <span className='text-allintra-gray-500 text-sm truncate w-full'>{consulta?.id}</span>
-              <div className='flex gap-3'>
-                <button className='px-3 py-1 w-[120px] text-allintra-error-50 bg-red-400 hover:bg-red-300 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => deletarConsulta(consulta?.id)}>Deletar</button>
-                <button className='px-3 py-1 w-[120px] text-allintra-attention-50 bg-orange-400 hover:bg-orange-300 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => alert('Editar Consulta')}>Remarcar</button>
+              <span className='text-allintra-gray-500 text-sm truncate w-full hidden sm:flex'>{consulta?.id}</span>
+              <div className='flex gap-3 w-full sm:w-[initial]'>
+                <button className='px-3 py-1 w-full sm:w-[120px] text-allintra-error-50 bg-red-400 hover:bg-red-300 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => deletarConsulta(consulta?.id)}>Deletar</button>
+                <button className='px-3 py-1 w-full sm:w-[120px] text-allintra-attention-50 bg-orange-400 hover:bg-orange-300 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => alert('Editar Consulta')}>Remarcar</button>
               </div>
             </div>
           </div>
         </Drawer.Content>
-      </Drawer.Root>
+      </Drawer.Root >
 
       {/* Drawer Inserir Consulta */}
-      <Drawer.Root open={drawer == 'abrir'} onOpenChange={setDrawer}>
+      < Drawer.Root open={drawer == 'abrir'
+      } onOpenChange={() => setDrawer('fechar')} >
         <Drawer.Content>
           {
             agendaConsulta.length ? (
@@ -290,7 +396,7 @@ export default function Consultation() {
                 <div className='shadow-md bg-white rounded-md overflow-auto border mb-3 flex flex-col justify-between relative'>
                   <div>
                     <div className='flex justify-between items-center p-4 sticky top-0 bg-allintra-white-50 shadow-sm'>
-                      <h2 className='font-semibold text-allintra-gray-700'>Preencha os dados e preencha a consulta</h2>
+                      <h2 className='font-semibold text-allintra-gray-700'>Preencha os dados da consulta</h2>
                       <div className='flex gap-3 items-center'>
                         <button className={`rounded p-2 shadow-sm border text-allintra-gray-700 hover:bg-allintra-gray-300`}>
                           <MdModeEditOutline />
@@ -334,7 +440,7 @@ export default function Consultation() {
                               Técnico responsável *
                             </label>
                             {decoded.name && (
-                              <input {...register('respTec')} value={decoded.name} disabled className={`shadow-sm block w-full bg-allintra-success-50 text-gray-700 border border-allintra-success-500 rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} id="grid-first-name" type="text" />
+                              <input {...register('respTec')} value={decoded.name} disabled id="respTec" className={`shadow-sm block w-full bg-allintra-success-50 text-gray-700 border border-allintra-success-500 rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} type="text" />
                             )}
                             {
                               errors.respTec && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
@@ -345,33 +451,33 @@ export default function Consultation() {
                               Cargo do responsável *
                             </label>
                             {role && (
-                              <input {...register('role')} value={role} disabled className={`shadow-sm block w-full bg-allintra-success-50 text-gray-700 border border-allintra-success-500 rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} id="grid-first-name" type="text" />
+                              <input {...register('role')} value={role} disabled id="role" className={`shadow-sm block w-full bg-allintra-success-50 text-gray-700 border border-allintra-success-500 rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} type="text" />
                             )}
                             {
                               errors.respTec && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                             }
                           </div>
                           <div className='mb-3'>
-                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="idProf">
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="idRespTec">
                               ID do responsável *
                             </label>
                             {decoded && (
-                              <input {...register('idProf')} value={decoded.idProf} disabled className={`shadow-sm block w-full bg-allintra-success-50 text-gray-700 border border-allintra-success-500 rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} id="grid-first-name" type="text" />
+                              <input {...register('idRespTec')} value={decoded.id} disabled className={`shadow-sm block w-full bg-allintra-success-50 text-gray-700 border border-allintra-success-500 rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} id="idRespTec" type="text" />
                             )}
                             {
-                              errors.respTec && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                              errors.idRespTec && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                             }
                           </div>
                         </div>
                       </div>
-                      <div className='flex justify-between items-center w-full gap-3 bg-allintra-gray-300 px-4 py-2 sticky bottom-0 left-0'>
-                        <span className='text-allintra-gray-500 text-sm truncate w-full'>{consulta?.id}</span>
-                        <div className='flex gap-3'>
-                          <button className='px-3 py-1 w-[120px] text-allintra-error-500 border border-allintra-error-500 bg-allintra-error-50 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => {
-                            setOpen(false)
+                      <div className='flex sm:flex-row sm:justify-between flex-col-reverse justify-end items-center w-full gap-3 bg-allintra-gray-300 px-4 py-2 sticky bottom-0 left-0'>
+                        <span className='text-allintra-gray-600 text-sm truncate w-full hidden sm:flex'>{moment().format("DD/MM/YYYY - HH:mm")}</span>
+                        <div className='flex gap-3 w-full sm:w-[initial]'>
+                          <button className='px-3 py-1 w-full sm:w-[120px] text-allintra-error-500 border border-allintra-error-500 bg-allintra-error-50 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => {
+                            setDrawer(`fechar`)
                             reset()
                           }}>Cancelar</button>
-                          <button type='submit' className='px-3 py-1 w-[120px] text-allintra-primary-800 border border-allintra-primary-800 bg-allintra-primary-50 transition-all text-sm font-semibold shadow-md rounded-md'>Inserir</button>
+                          <button type='submit' className='px-3 py-1 w-full sm:w-[120px] text-allintra-primary-800 border border-allintra-primary-800 bg-allintra-primary-50 transition-all text-sm font-semibold shadow-md rounded-md'>Inserir</button>
                         </div>
                       </div>
                     </form >
