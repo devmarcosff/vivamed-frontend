@@ -46,6 +46,7 @@ module.exports = withMT({
           },
           error: {
             50: '#F8ECEE',
+            400: '#ef5350 ',
             500: '#D12100',
           },
         },

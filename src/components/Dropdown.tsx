@@ -43,7 +43,7 @@ export default function Dropdown() {
 
       <MenuItems
         transition
-        className={`absolute ${expanded ? 'right-0' : 'left-0'} bottom-16 z-10 mt-2 w-40 origin-bottom-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-150 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"`}>
+        className={`absolute ${expanded ? 'right-0' : 'left-0'} bottom-16 z-20 mt-2 w-40 origin-bottom-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-150 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"`}>
         <div className="py-1">
           <MenuItem>
             <Link href={'/perfil'}

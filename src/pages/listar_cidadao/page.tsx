@@ -9,11 +9,10 @@ import { useEffect, useState } from "react";
 import { BsClipboardPlusFill } from "react-icons/bs";
 
 export default function ListarCidadao() {
+  const token = Cookie.get('accessToken');
   const [cidadao, setCidadao] = useState<any>([])
   const [open, setOpen] = useState(false)
   const [senhaCidadao, setSenhaCidadao] = useState<number>()
-
-  const token = Cookie.get('accessToken');
 
   const fetchData = async () => {
     await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cidadao`, {
@@ -23,9 +22,6 @@ export default function ListarCidadao() {
     }).then(e => setCidadao(e.data)).catch(e => console.log(e))
   }
 
-  // useEffect(() => {
-  //   fetchData()
-  // }, [open == false]);
   useEffect(() => {
     fetchData()
   }, [cidadao]);

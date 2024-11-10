@@ -22,12 +22,10 @@ interface CadastroCidadao {
 
 // SIDEBAR
 export function Sidebar({ children }: string | any) {
-  const [expanded, setExpanded] = useState<boolean>(true)
+  const [expanded, setExpanded] = useState<any>(localStorage.getItem('expandedMenu') == 'true' ? true : false)
   const [user, setUser] = useState<CadastroCidadao | undefined>()
 
   useEffect(() => {
-    const isDesktop = window.innerWidth >= 858;
-    setExpanded(isDesktop)
     // Verifica se está no lado do cliente
     if (typeof window !== 'undefined') {
       const token = Cookie.get('accessToken');
@@ -41,7 +39,7 @@ export function Sidebar({ children }: string | any) {
 
   return (
     <aside className={`z-20`} >
-      <nav className={`flex flex-col overflow-hidden absolute transition-all duration-500 border-r shadow-sm bg-white md:h-full
+      <nav className={`flex flex-col absolute transition-all duration-500 border-r shadow-sm bg-white md:h-full
           ${expanded ? 'h-full w-full md:relative md:w-64' : 'h-16 w-full md:relative md:w-[66px]'}
         `}>
         <div className="p-4 pb-2 flex justify-between items-center">
@@ -50,7 +48,10 @@ export function Sidebar({ children }: string | any) {
             <span className="font-semibold text-cyan-800">Vivamed</span>
           </div>
           <button
-            onClick={() => setExpanded(click => !click)}
+            onClick={() => {
+              expanded == true ? localStorage.setItem('expandedMenu', 'false') : localStorage.setItem('expandedMenu', 'true')
+              setExpanded((click: any) => !click)
+            }}
             className="p-1.5 rounded-lg bg-gray-300 hover:bg-gray-200 transition-all">
             {expanded ? <ChevronFirst /> : <ChevronLast />}
           </button>
@@ -95,7 +96,7 @@ export function SidebarItem({ icon, text, active, alert, subMenu, children, url 
 
           {alert && <div className={`absolute right-2 w-2 h-2 rounded bg-cyan-400 animate-pulse duration-1000 ${expanded ? '' : 'top-2'}`} />}
 
-          {!expanded && <div className={`absolute left-full rounded-md px-2 py-1 ml-6 bg-cyan-100 text-cyan-800 text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}>{text}</div>}
+          <div className={`absolute left-full rounded-md px-2 py-1 ml-6 bg-cyan-100 text-cyan-800 text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}>{text}</div>
         </div>
         {expanded && <div className={`${clickMenu ? 'flex py-2 my-1' : 'hidden'} mr-2 transition-all`}>{children}</div>}
       </li>
@@ -108,7 +109,7 @@ export const SidebarSubmenu = ({ name, url, icon }: any) => {
   return (
     <>
       <ul className="py-1 w-full space-y-2">
-        <li className="hover:translate-x-2 bg-white rounded-lg border-cyan-200 border-l-4 shadow-md transition-all">
+        <li className="hover:translate-x-2 bg-white rounded-lg border-allintra-primary-50 border-l-4 shadow-md transition-all">
           <Link href={url} className="flex items-center gap-3 w-full p-2 transition duration-75">
             {icon}
             {name}
@@ -152,6 +153,12 @@ export const SidebarTrue = () => {
       {(role === "admin" || role === "coordenadorcaps" || role === "coordenadorfarmacia" || role === "administrativo") && <SidebarItem icon={<BriefcaseMedical size={20} />} text="Colaboradores" url={'/colaboradores'} />}
       <SidebarItem icon={<ImProfile size={20} />} text="Perfil" url={'/perfil'} />
 
+      {/* <SidebarItem alert icon={<Boxes size={20} />} text="Atividade CAPS" subMenu>
+        <div className="flex-col">
+          <SidebarSubmenu name="Grupo da mulher" url="/cadastrar_medicamento" icon={<CirclePlus size={20} />} />
+          <SidebarSubmenu name="Grupo de terapia" url="/cadastrar_medicamento" icon={<CirclePlus size={20} />} />
+        </div>
+      </SidebarItem> */}
       {/* <SidebarItem icon={<UserCircle size={20} />} text="Estatística" />
       <SidebarItem icon={<Package size={20} />} text="Estoque" /> */}
       {/* <SidebarItem icon={<Boxes size={20} />} text="Farmácia" subMenu>

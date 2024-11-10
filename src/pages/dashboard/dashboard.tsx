@@ -83,7 +83,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex justify-center items-center w-full h-full">
+    <div className={`flex justify-center items-center w-full h-full ${role === 'admin' ? 'my-40' : 'my-10'} md:my-0`}>
       <div className={`w-[80%] grid grid-cols-1 ${role === 'admin' ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-5 justify-center items-center`}>
         {verBotoes(role)}
       </div>

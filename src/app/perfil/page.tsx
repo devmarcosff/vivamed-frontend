@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 export default function Profile() {
 
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <SidebarTrue />
-      <div className="w-full md:py-5 py-20 px-5 h-screen">
+      <div className="w-full md:py-5 py-20 px-5">
         <Perfil />
       </div>
     </div>

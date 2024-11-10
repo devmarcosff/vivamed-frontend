@@ -14,8 +14,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { BsClipboardPlusFill } from 'react-icons/bs';
-import { IoIosInformationCircleOutline, IoMdCheckmark, IoMdPrint } from 'react-icons/io';
-import { MdModeEditOutline } from 'react-icons/md';
+import { IoIosInformationCircleOutline, IoMdAddCircleOutline, IoMdCheckmark, IoMdPrint } from 'react-icons/io';
+import { MdDelete, MdModeEditOutline } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import './style.css';
 
@@ -34,17 +34,18 @@ export default function Consultation() {
   const router = useRouter();
   const pathname = usePathname();
   const [consulta, setConsulta] = useState<any>()
+  const [idConsulta, setIdConsulta] = useState<any>()
   const [drawer, setDrawer] = useState<any>('fechar')
   const [consultas, setConsultas] = useState<any>([])
   const [agendaConsulta, setAgendaConsulta] = useState<any>([])
   const [colaborador, setColaborador] = useState<any>([])
   const [medicamentos, setMedicamentos] = useState<any>([])
   const [role, setRole] = useState<any>([])
-  const [decoded, setDecoded] = useState<any>([])
+  const [decoded, setUser] = useState<any>([])
   const [open, setOpen] = useState(false)
-  const [idsMedicamentos, setIdsMedicamentos] = useState<any>()
+  const [criarMedicamentos, setCriarMedicamentos] = useState<any>([]);
   const token = Cookie.get('accessToken')
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm()
+  const { register, handleSubmit, control, reset, formState: { errors, isSubmitting } } = useForm()
 
   const detalhesConsulta = async (detalheconsulta: any) => {
     setDrawer(`${'detalhesconsulta'}`)
@@ -59,19 +60,57 @@ export default function Consultation() {
     }).catch(e => console.log(e))
   }
 
-  const handleOpen = (value: any) => setOpen(open === value ? 0 : value);
-
   const abrirConsulta = () => {
     setDrawer(`${'abrir'}`)
   }
 
   const inserirConsulta = async (data: any) => {
     var consulta = {
+      "idRespTec": decoded?.id,
       "prontuario": data.prontuario,
-      "respTec": decoded?.id,
       "role": decoded?.role,
-      "idProf": decoded?.idProf,
-      "descricao": data.descricao
+      "descricao": data.descricao,
+    }
+
+    const createMedicamento = async () => {
+      const encontrarMedicamento = criarMedicamentos.some((item: any) => item.name && item.manha && item.tarde && item.noite)
+      if (encontrarMedicamento === true) {
+        const medicamentosComConsulta = criarMedicamentos.map((medicamento: any) => ({
+          ...medicamento,
+          consulta: localStorage.getItem('idConsulta'),  // A consulta vai ser passada para todos os medicamentos
+        }));
+        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/medicamentos`, medicamentosComConsulta, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+        }).then(e => {
+          setDrawer(`fechar`)
+          localStorage.removeItem('idConsulta')
+          setCriarMedicamentos([])
+          toast.success(`${e.data}`, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }).catch(e => {
+          toast.error("Erro ao adicionar medicamento.", {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        })
+      }
     }
 
     await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/consulta`, consulta, {
@@ -80,9 +119,9 @@ export default function Consultation() {
         'Authorization': `Bearer ${token}`
       },
     }).then(e => {
-      setConsulta(e.data)
+      localStorage.setItem('idConsulta', e.data)
       reset()
-      // setDrawer(`${'fechar'}`)
+      if (localStorage.getItem('idConsulta')) createMedicamento()
       setDrawer(`fechar`)
       toast.success("Consulta inserida com sucesso.", {
         position: "bottom-right",
@@ -108,17 +147,88 @@ export default function Consultation() {
     })
   }
 
+  const deletarMedicamento = async (id?: string) => {
+    await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/medicamentos/deletemany/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).then(e => {
+      console.log('Deletando medicamento...')
+      setDrawer(`fechar`)
+      toast.success(`${e.data}`, {
+        position: "bottom-right",
+        autoClose: 2500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      console.log('Deletado')
+    }).catch(e => {
+      console.log(e.data)
+      toast.error(`${e.data}`, {
+        position: "bottom-right",
+        autoClose: 2500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    })
+  }
+
   const deletarConsulta = async (id?: string) => {
-    console.log('Deletando medicamento...')
     const idsMedicamentos = medicamentos.length > 0 ? medicamentos.map((med: any) => med.id).join(',') : null;
+    const consultaAposMedicamento = async () => {
+      try {
+        console.log('Aguarde deletando consulta...')
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/consulta/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }).then(e => {
+          console.log('Consulta deletada com sucesso')
+          setDrawer(`fechar`)
+          toast.success(`${e.data}`, {
+            position: "bottom-right",
+            autoClose: 2500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }).catch(e => {
+          toast.error(`${e.data}`, {
+            position: "bottom-right",
+            autoClose: 2500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        })
+      } catch (err) {
+        console.log('Erro ao excluir consulta:', err)
+      }
+    }
     if (idsMedicamentos) {
+      console.log('Aguarde deletando medicamento...')
       try {
         await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/medicamentos/deletemany/${idsMedicamentos}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         }).then(e => {
-          // setDrawer(`${'fechar'}`)
+          console.log('Medicamento deletado com sucesso')
+          consultaAposMedicamento()
           toast.success(`${e.data}`, {
             position: "bottom-right",
             autoClose: 2500,
@@ -144,43 +254,7 @@ export default function Consultation() {
       } catch (err) {
         console.log('Erro ao excluir medicamento:', err)
       }
-    }
-    console.log('Aguarde...')
-
-    console.log('Deletando consulta...')
-    try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/consulta/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }).then(e => {
-        // setDrawer(`${'fechar'}`)
-        setDrawer(`fechar`)
-        toast.success(`${e.data}`, {
-          position: "bottom-right",
-          autoClose: 2500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      }).catch(e => {
-        toast.error(`${e.data}`, {
-          position: "bottom-right",
-          autoClose: 2500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      })
-    } catch (err) {
-      console.log('Erro ao excluir consulta:', err)
-    }
+    } else { consultaAposMedicamento() }
   }
 
   const Icon = ({ id, open }: any) => {
@@ -219,13 +293,28 @@ export default function Consultation() {
       }).then(e => setColaborador(e.data)).catch(e => console.log(e))
     }
     const isGetCookie = getCookie()
-    userDecoded(setDecoded)
+    userDecoded(setUser)
     setRole(isGetCookie)
     fetchData()
     isNotCaps(`${pathname}`)
   }, [drawer == 'fechar']);
 
-  console.log(drawer)
+  const adicionarMedicamento = () => {
+    const novoMedicamento = { name: '', manha: '', tarde: '', noite: '' };
+    setCriarMedicamentos((prevState: any) => [...prevState, novoMedicamento]);
+  };
+
+  const handleInputChange = (index: any, field: any, value: any) => {
+    setCriarMedicamentos((prevState: any) =>
+      prevState.map((criarMedicamentos: any, i: any) =>
+        i === index ? { ...criarMedicamentos, [field]: value } : criarMedicamentos
+      )
+    );
+  };
+
+  const removerMedicamento = (indexToRemove: any) => {
+    setCriarMedicamentos((prevState: any) => prevState.filter((_: any, index: any) => index !== indexToRemove));
+  };
 
   return (
     <>
@@ -335,14 +424,14 @@ export default function Consultation() {
 
                 <div className="w-full p-3 my-2 border-t">
                   <span className="text-allintra-gray-700 text-sm">Anamnese / Exame Clínico</span>
-                  <div className="border p-5 text-gray-800 animate-scaleIn rounded bg-allintra-gray-300 hover:border-allintra-primary-500 w-full break-words whitespace-pre-line">
+                  <div className="border shadow-sm p-5 text-gray-800 animate-scaleIn rounded bg-allintra-gray-300 hover:border-allintra-primary-500 w-full break-words whitespace-pre-line">
                     {consulta?.descricao}
                   </div>
                 </div>
 
                 {
                   medicamentos.length ? (
-                    <div className="w-full p-3 my-2 border-t">
+                    <div className="w-full py-3 my-2 border-t">
                       <span className='text-allintra-gray-700 text-sm'>Medicamentos</span>
                       <div className='text-gray-800 grid sm:grid-cols-4 grid-cols-1 gap-3'>
                         {
@@ -355,10 +444,18 @@ export default function Consultation() {
                             //     <p><span className="font-semibold flex flex-col">Tempo de uso:</span> {item.use || '8/8 horas - Uso oral'}</p>
                             //   </AccordionBody>
                             // </Accordion>
-                            <ul key={index} className='bg-white rounded-md px-3 py-2 border relative z-0 hover:border-allintra-primary-500 transition-all animate-scaleIn'>
-                              <li className='capitalize font-semibold'>{item.prescricao}</li>
-                              <li>{item.quantidade} un. de {item.use}</li>
-                            </ul>
+                            <>
+                              <ul key={index} className='bg-white shadow-sm group/delete rounded-md px-3 py-2 border relative z-0 hover:border-allintra-primary-500 transition-all animate-scaleIn'>
+                                <li className='capitalize font-semibold'>{item.name}</li>
+                                <li>Horário Manhã: {item.manha}</li>
+                                <li>Horário Tarde: {item.tarde}</li>
+                                <li>Horário Noite: {item.noite}</li>
+
+                                <button
+                                  onClick={() => deletarMedicamento(item.id)}
+                                  className='group-hover/delete:flex hidden transition-all bg-allintra-error-50 border-allintra-error-500 hover:bg-red-100 absolute top-3 right-3 border rounded shadow-sm p-1'><MdDelete /></button>
+                              </ul>
+                            </>
                           ))
                         }
                       </div>
@@ -409,7 +506,7 @@ export default function Consultation() {
 
                     <form className="w-full" onSubmit={handleSubmit(inserirConsulta)}>
                       <div className="flex flex-wrap p-5 text-left justify-between">
-                        <div className="w-full md:w-2/3 px-3 mb-6 md:mb-0">
+                        <div className="w-full md:w-2/3 px-3 mb-6 md:mb-3">
                           <div className='mb-3'>
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
                               paciente *
@@ -469,18 +566,99 @@ export default function Consultation() {
                             }
                           </div>
                         </div>
+
+                        {/* ADICIONAR MEDICAMENTOS */}
+                        {criarMedicamentos?.map((item: any, index: any) => (
+                          <div className='w-full flex flex-wrap my-4 relative' key={index}>
+                            <div className="w-full sm:w-1/4 px-3 py-3 border-t md:mb-0">
+                              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="name">
+                                Medicamento *
+                              </label>
+                              <select onChange={e => handleInputChange(index, 'name', e.target.value)} name="name" id="name" className={`${errors.quantidade && 'border-red-500'} shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}>
+                                <option value={''}>Selecione um paciente</option>
+                                <option value={'rivotril'}>Rivotril</option>
+                                <option value={'dipirona'}>Dipirona</option>
+                              </select>
+                              {
+                                errors.paciente && <p className="text-red-500 text-xs italic">Por favor selecione um colaborador</p>
+                              }
+                            </div>
+                            <div className="w-full sm:w-1/4 px-3 py-3 border-t md:mb-0">
+                              <div>
+                                <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="manha">
+                                  Manhã
+                                </label>
+                                <input
+                                  onChange={e => handleInputChange(index, 'manha', e.target.value)}
+                                  type='text'
+                                  placeholder='10'
+                                  id="manha"
+                                  name="manha"
+                                  className={`${errors.manha && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
+                                {
+                                  errors.manha && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                                }
+                              </div>
+                            </div>
+                            <div className="w-full sm:w-1/4 px-3 py-3 border-t md:mb-0">
+                              <div>
+                                <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="tarde">
+                                  Tarde
+                                </label>
+                                <input
+                                  type='text'
+                                  placeholder='10'
+                                  id="tarde"
+                                  name="tarde"
+                                  onChange={(e) => handleInputChange(index, 'tarde', e.target.value)}
+                                  className={`${errors.tarde && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
+                                {
+                                  errors.tarde && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                                }
+                              </div>
+                            </div>
+                            <div className="w-full sm:w-1/4 px-3 py-3 border-t md:mb-0">
+                              <div>
+                                <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="noite">
+                                  Noite
+                                </label>
+                                <input onChange={e => handleInputChange(index, 'noite', e.target.value)} type='text' placeholder='10' id="noite" name="noite" className={`${errors.noite && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
+                                {
+                                  errors.noite && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                                }
+                              </div>
+                            </div>
+                            <div className="w-full px-3 md:mb-0 py-1">
+                              <button
+                                type="button"
+                                onClick={() => removerMedicamento(index)}
+                                className="
+                                  absolute top-2 right-3 p-1
+                                  text-allintra-error-500 border border-allintra-error-500 bg-allintra-error-50 hover:bg-allintra-error-500 hover:text-white transition-all text-sm font-semibold shadow-sm rounded"
+                              ><MdDelete /></button>
+                            </div>
+                          </div>
+                        ))}
+                        <div className="w-full px-3 mb-3 py-3 border-t md:mb-0">
+                          <button type="button" onClick={adicionarMedicamento}>
+                            <span className='flex gap-2 items-center text-allintra-gray-700 font-semibold'><IoMdAddCircleOutline /> Adicionar medicamentos</span>
+                          </button>
+                        </div>
+
                       </div>
                       <div className='flex sm:flex-row sm:justify-between flex-col-reverse justify-end items-center w-full gap-3 bg-allintra-gray-300 px-4 py-2 sticky bottom-0 left-0'>
                         <span className='text-allintra-gray-600 text-sm truncate w-full hidden sm:flex'>{moment().format("DD/MM/YYYY - HH:mm")}</span>
                         <div className='flex gap-3 w-full sm:w-[initial]'>
                           <button className='px-3 py-1 w-full sm:w-[120px] text-allintra-error-500 border border-allintra-error-500 bg-allintra-error-50 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => {
                             setDrawer(`fechar`)
+                            setCriarMedicamentos([])
                             reset()
                           }}>Cancelar</button>
-                          <button type='submit' className='px-3 py-1 w-full sm:w-[120px] text-allintra-primary-800 border border-allintra-primary-800 bg-allintra-primary-50 transition-all text-sm font-semibold shadow-md rounded-md'>Inserir</button>
+                          <button type='submit' className='px-3 py-1 w-full sm:w-[120px] text-allintra-primary-800 border border-allintra-primary-800 bg-allintra-primary-50 hover:bg-allintra-primary-500 hover:text-white transition-all  text-sm font-semibold shadow-md rounded-md'>Inserir</button>
                         </div>
                       </div>
-                    </form >
+                    </form>
+
                   </div >
                 </div >
               </>
@@ -496,7 +674,7 @@ export default function Consultation() {
         </Drawer.Content >
       </Drawer.Root >
 
-      {/* <CadastrarConsulta openModal={open} closeModal={setOpen} /> */}
+      {/* <CadastrarConsulta openModal={true} closeModal={setOpen} /> */}
     </>
   );
 }
