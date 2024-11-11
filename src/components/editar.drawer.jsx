@@ -36,18 +36,7 @@ export default function EditarDrawer({ openModal, closeModal, consulta }) {
                 <div className="shadow-md">
                   <DialogHeader className='flex justify-between items-center'>
                     <DialogTitle className="text-sm font-semibold text-gray-600 truncate max-w-[225px] hover:max-w-full cursor-pointer">Detalhes da consulta</DialogTitle>
-                    {/* <div className='flex-col justify-start items-start'>
-                      <DialogTitle className="text-base font-semibold text-gray-800">Informações do agendamento</DialogTitle>
-                      <DialogTitle className="text-sm font-semibold text-gray-600 truncate max-w-[225px] hover:max-w-full cursor-pointer">{consulta?.paciente}</DialogTitle>
-                    </div>
-                    <div className='flex-col justify-center items-center text-center'>
-                      <DialogTitle className="text-sm font-semibold text-gray-600">{!!consulta.dataconsulta && moment(consulta?.dataconsulta).format("DD/MM/YYYY")}</DialogTitle>
-                      <DialogTitle className="text-sm font-semibold text-gray-600">{moment(consulta.horaconsulta, 'HH:mm:ss').format("HH:mm")}</DialogTitle>
-                    </div> */}
                   </DialogHeader>
-                  {/* <DialogHeader className='flex pt-0 gap-3'>
-                    <span className='animate-pulse text-[10px] bg-red-400 text-white px-3 py-1 rounded-full font-black uppercase'>Agendada</span>
-                  </DialogHeader> */}
                 </div>
                 <div className="p-4">
                   <div className='shadow-md p-4 rounded-md'>

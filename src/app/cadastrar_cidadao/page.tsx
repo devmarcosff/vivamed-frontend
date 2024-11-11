@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <div className="flex">
       <SidebarTrue />
-      <div className="w-full md:py-5 py-20 px-5 h-screen">
+      <div className="flex flex-wrap w-full mt-16 sm:my-0 px-3 overflow-hidden h-screen">
         <ListarCidadao />
       </div>
     </div>

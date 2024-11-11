@@ -3,11 +3,11 @@
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import axios from 'axios';
 import Cookie from 'js-cookie';
-import { jwtDecode } from 'jwt-decode';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ImSpinner2 } from "react-icons/im";
 import { toast } from 'react-toastify';
+import getCookie from './getCookie';
 
 interface CadastroCidadao {
   id: string,
@@ -132,13 +132,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
       }).then(e => setCidadao(e.data)).catch(e => console.log(e))
     }
     // Verifica se está no lado do cliente
-    if (typeof window !== 'undefined') {
-      const token = Cookie.get('accessToken');
-      if (token) {
-        const decoded = jwtDecode<CadastroCidadao>(`${token}`)
-        setUser(decoded);
-      }
-    }
+    getCookie()
 
     fetchData()
   }, []);

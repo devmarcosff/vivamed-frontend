@@ -72,7 +72,7 @@ export default function CadastrarCidadaoModal({ openModal, closeModal }: any) {
   ];
 
   return (
-    <Dialog open={openModal} onClose={closeModal} className="relative z-10">
+    <Dialog open={openModal} onClose={closeModal} className="relative z-50">
       <DialogBackdrop
         transition
         className="fixed inset-0 backdrop-blur-sm bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
