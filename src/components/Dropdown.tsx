@@ -60,6 +60,7 @@ export default function Dropdown() {
               onClick={() => {
                 destroyCookie(null, 'accessToken')
                 destroyCookie(null, 'authRole')
+                localStorage.setItem('expandedMenu', 'false')
                 push('/login')
               }}
               className="flex gap-2 px-2 py-2 w-full text-sm text-gray-600 data-[focus]:bg-cyan-50 data-[focus]:text-gray-900"

@@ -22,10 +22,14 @@ interface CadastroCidadao {
 
 // SIDEBAR
 export function Sidebar({ children }: string | any) {
-  const [expanded, setExpanded] = useState<any>(localStorage.getItem('expandedMenu') == 'true' ? true : false)
   const [user, setUser] = useState<CadastroCidadao | undefined>()
+  const [expanded, setExpanded] = useState<any>()
 
   useEffect(() => {
+    // Apenas no lado do cliente
+    const expandedMenu = localStorage.getItem('expandedMenu');
+    setExpanded(expandedMenu == 'true' ? true : false);
+
     // Verifica se está no lado do cliente
     if (typeof window !== 'undefined') {
       const token = Cookie.get('accessToken');
@@ -39,7 +43,7 @@ export function Sidebar({ children }: string | any) {
 
   return (
     <aside className={`z-20`} >
-      <nav className={`flex flex-col absolute transition-all duration-500 border-r shadow-sm bg-white md:h-full
+      <nav className={`flex flex-col overflow-hidden fixed transition-all duration-500 border-r shadow-sm bg-white md:h-screen
           ${expanded ? 'h-full w-full md:relative md:w-64' : 'h-16 w-full md:relative md:w-[66px]'}
         `}>
         <div className="p-4 pb-2 flex justify-between items-center">

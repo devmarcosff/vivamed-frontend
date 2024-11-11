@@ -280,7 +280,7 @@ export default function Consultation() {
         }
       }).then(e => setConsultas(e.data)).catch(e => console.log(e))
 
-      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/agendasconsulta`, {
+      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/agendasconsulta/todos`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -436,14 +436,6 @@ export default function Consultation() {
                       <div className='text-gray-800 grid sm:grid-cols-4 grid-cols-1 gap-3'>
                         {
                           medicamentos.map((item: any, index: any) => (
-                            // <Accordion placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} key={index} className="bg-white my-3 rounded-md px-5 border relative z-0 hover:border-allintra-primary-500 transition-all animate-scaleIn" open={open} icon={<Icon id={item.id} open={open} />}>
-                            //   <AccordionHeader placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} onClick={() => handleOpen(item.id)} className="text-sm font-semibold border-none capitalize">{item.prescricao}</AccordionHeader>
-                            //   <AccordionBody>
-                            //     <p className="capitalize"><span className="font-semibold">Nome:</span> {item.prescricao}</p>
-                            //     <p><span className="font-semibold">Quantidade:</span> {item.quantidade}</p>
-                            //     <p><span className="font-semibold flex flex-col">Tempo de uso:</span> {item.use || '8/8 horas - Uso oral'}</p>
-                            //   </AccordionBody>
-                            // </Accordion>
                             <>
                               <ul key={index} className='bg-white shadow-sm group/delete rounded-md px-3 py-2 border relative z-0 hover:border-allintra-primary-500 transition-all animate-scaleIn'>
                                 <li className='capitalize font-semibold'>{item.name}</li>
@@ -511,11 +503,13 @@ export default function Consultation() {
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
                               paciente *
                             </label>
-                            <select {...register('prontuario')} name="prontuario" id="prontuario" className={`shadow-sm block w-full bg-white text-gray-700 border rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`}>
+                            <select
+                              {...register('prontuario')}
+                              name="prontuario"
+                              id="prontuario"
+                              className={`shadow-sm block w-full bg-white text-gray-700 border rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`}>
                               <option value={''}>Selecione um paciente</option>
-                              {
-                                agendaConsulta.map((item: any, index: any) => <option value={item.prontuario} key={index}>{item.paciente}</option>)
-                              }
+                              {agendaConsulta?.map((item: any, index: any) => <option value={item?.prontuario} key={index}>{item?.paciente}</option>)}
                             </select>
                             {
                               errors.paciente && <p className="text-red-500 text-xs italic">Por favor selecione um colaborador</p>

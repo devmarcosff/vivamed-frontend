@@ -20,7 +20,7 @@ export default function RootLayout({
 
   return (
     <html lang="pt-br">
-      <body className={`${urbanist.className} bg-cyan-50 overflow-x-hidden`}>
+      <body className={`${urbanist.className} bg-allintra-primary-50 overflow-x-hidden`}>
         {children}
         <ToastContainer />
       </body>
