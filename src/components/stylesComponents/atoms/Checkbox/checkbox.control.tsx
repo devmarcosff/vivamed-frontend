@@ -2,9 +2,7 @@ import React from 'react';
 
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import { clsx } from 'clsx';
-
-import CheckIcon from '~/assets/icons/check-icon.svg?react';
-
+import { FaCheck } from 'react-icons/fa';
 import { CheckboxControlProps } from './checkbox.types';
 
 const CheckboxControl = React.forwardRef<HTMLButtonElement, CheckboxControlProps>(
@@ -27,7 +25,7 @@ const CheckboxControl = React.forwardRef<HTMLButtonElement, CheckboxControlProps
         {...props}
       >
         <CheckboxPrimitive.Indicator>
-          <CheckIcon className="p-[2px] self-center text-white" />
+          <FaCheck className="p-[2px] self-center text-white" />
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>
     );

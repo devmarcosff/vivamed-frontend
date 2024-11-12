@@ -43,7 +43,7 @@ export function Sidebar({ children }: string | any) {
 
   return (
     <aside className={`z-20`} >
-      <nav className={`flex flex-col overflow-hidden fixed transition-all duration-500 border-r shadow-sm bg-white md:h-screen
+      <nav className={`flex flex-col fixed transition-all duration-500 border-r shadow-sm bg-white md:h-screen
           ${expanded ? 'h-full w-full md:relative md:w-64' : 'h-16 w-full md:relative md:w-[66px]'}
         `}>
         <div className="p-4 pb-2 flex justify-between items-center">

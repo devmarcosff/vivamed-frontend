@@ -16,7 +16,7 @@ interface CadastroCidadao {
   tecResponsavel: string
 }
 
-export default function AgendarConsulta({ openAgenda, closeAgenda }: any) {
+export default function AgendarNovaConsulta({ openAgenda, closeAgenda }: any) {
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm();
   const token = Cookie.get('accessToken');
   const [consulta, setConsulta] = useState<any>()
@@ -86,7 +86,7 @@ export default function AgendarConsulta({ openAgenda, closeAgenda }: any) {
     getCookie()
 
     fetchData()
-  }, []);
+  }, [token]);
 
   return (
     <Dialog open={openAgenda} onClose={closeAgenda} className="relative z-[100]">

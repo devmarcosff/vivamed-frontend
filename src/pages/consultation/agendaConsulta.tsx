@@ -1,6 +1,6 @@
 "use client"
 
-import AgendarConsulta from '@/components/agendar_consulta.modal';
+import AgendarNovaConsulta from '@/components/agendar_consulta.modal';
 import { BoxInfo } from '@/components/stylesComponents/molecules/BoxInfo';
 import { Drawer } from '@/components/stylesComponents/organisms/Drawer';
 import { isNotCaps } from '@/components/types/routes.t';
@@ -31,7 +31,7 @@ interface IConsulta {
   status: string
 }
 
-export default function agendarConsulta() {
+export default function AgendarConsulta() {
   const pathname = usePathname();
   const [drawer, setDrawer] = useState(false)
   const [consulta, setConsulta] = useState<IConsulta>()
@@ -229,7 +229,7 @@ export default function agendarConsulta() {
         </Drawer.Content>
       </Drawer.Root>
 
-      <AgendarConsulta openAgenda={agenda} closeAgenda={setAgenda} />
+      <AgendarNovaConsulta openAgenda={agenda} closeAgenda={setAgenda} />
     </>
   );
 }

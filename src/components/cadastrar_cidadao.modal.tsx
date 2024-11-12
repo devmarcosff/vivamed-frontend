@@ -13,7 +13,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiAlertTriangle } from "react-icons/fi";
 import { ImSpinner2 } from "react-icons/im";
-import InputMask from 'react-input-mask';
+import ReactInputMask from 'react-input-mask';
 import { toast } from 'react-toastify';
 
 interface CadastroCidadao {
@@ -184,12 +184,14 @@ function DadosPessoais({ setDadosCadastrais, setActiveTab, closeModal }: any) {
             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="cpf">
               CPF *
             </label>
-            <InputMask
-              mask="999.999.999-99"
+            <ReactInputMask
               {...register('cpf', { required: 'Por favor preencha este campo' })}
-            >
-              {(inputProps: any) => <input {...inputProps} type="text" placeholder="000.000.000-00" className={`${errors.cpf && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} id="cpf" />}
-            </InputMask>
+              type='tel'
+              id="cpf"
+              mask="999.999.999-99"
+              placeholder='999.999.999-99'
+              className={`${errors.telContato && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`}
+            />
             {
               errors.cpf && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
             }
@@ -198,12 +200,14 @@ function DadosPessoais({ setDadosCadastrais, setActiveTab, closeModal }: any) {
             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="telContato">
               Telefone de contato *
             </label>
-            <InputMask
-              mask="(99) 99999-9999"
+            <ReactInputMask
               {...register('telContato', { required: 'Por favor preencha este campo' })}
-            >
-              {(inputProps: any) => <input {...inputProps} placeholder='(22)99999-9999' type="tel" className={`${errors.telContato && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} id="telContato" />}
-            </InputMask>
+              type='tel'
+              id="telContato"
+              mask="(99) 99999-9999"
+              placeholder='(22)99999-9999'
+              className={`${errors.telContato && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`}
+            />
             {
               errors.telContato && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
             }

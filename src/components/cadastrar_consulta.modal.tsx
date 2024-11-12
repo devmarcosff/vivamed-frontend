@@ -135,7 +135,7 @@ export default function CadastrarConsulta({ openModal, closeModal }: any) {
     getCookie()
 
     fetchData()
-  }, []);
+  }, [token]);
 
   return (
     <Dialog open={openModal} onClose={closeModal} className="relative z-[100]">

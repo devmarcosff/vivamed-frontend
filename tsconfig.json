@@ -27,6 +27,10 @@
       ]
     }
   },
+  "typeRoots": [
+    "node_modules/@types",
+    "node_modules/@radix-ui/react-switch"
+  ],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
