@@ -7,6 +7,7 @@ import Cookie from 'js-cookie';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ImSpinner2 } from 'react-icons/im';
+import ReactInputMask from 'react-input-mask';
 import { toast } from 'react-toastify';
 import getCookie from './getCookie';
 
@@ -164,7 +165,15 @@ export default function CadastrarCidadaoModal({ openModal, closeModal, senhaCida
                                 <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="cpf">
                                   cpf *
                                 </label>
-                                <input {...register('cpf', { required: 'Por favor preencha este campo' })} className={`${errors.cpf && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="cpf" type="text" placeholder="000.000.000-00" />
+                                <ReactInputMask
+                                  {...register('cpf', { required: 'Por favor preencha este campo' })}
+                                  type='tel'
+                                  id="cpf"
+                                  mask="999.999.999-99"
+                                  placeholder='999.999.999-99'
+                                  className={`${errors.telContato && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`}
+                                />
+                                {/* <input {...register('cpf', { required: 'Por favor preencha este campo' })} className={`${errors.cpf && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`} id="cpf" type="text" placeholder="000.000.000-00" /> */}
                                 {
                                   errors.cpf && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                                 }
@@ -173,7 +182,15 @@ export default function CadastrarCidadaoModal({ openModal, closeModal, senhaCida
                                 <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="birthday">
                                   Data de nascimento *
                                 </label>
-                                <input {...register('birthday', { required: 'Por favor preencha este campo' })} className={`${errors.birthday && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} id="birthday" type="date" />
+                                <ReactInputMask
+                                  {...register('birthday', { required: 'Por favor preencha este campo' })}
+                                  type='text'
+                                  id="birthday"
+                                  mask="99/99/9999"
+                                  placeholder='01/01/1999'
+                                  className={`${errors.telContato && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`}
+                                />
+                                {/* <input {...register('birthday', { required: 'Por favor preencha este campo' })} className={`${errors.birthday && 'border-red-500'} appearance-none shadow-md block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500`} id="birthday" type="date" /> */}
                                 {
                                   errors.birthday && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
                                 }
