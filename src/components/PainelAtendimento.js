@@ -3,7 +3,7 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
-const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`); // Substitua pela URL do seu backend
+const socket = io('https://vivamedapi.stevanini.com.br'); // Substitua pela URL do seu backend
 
 function PainelConsultas() {
   const [consultas, setConsultas] = useState([]);
