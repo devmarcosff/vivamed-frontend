@@ -43,8 +43,8 @@ export function Sidebar({ children }: string | any) {
 
   return (
     <aside className={`z-20`} >
-      <nav className={`flex flex-col fixed transition-all duration-500 border-r shadow-sm bg-white md:h-screen
-          ${expanded ? 'h-full w-full md:relative md:w-64' : 'h-16 w-full md:relative md:w-[66px]'}
+      <nav className={`flex flex-col transition-all duration-500 border-r shadow-sm bg-white md:h-screen fixed md:sticky top-0
+          ${expanded ? 'h-full w-full md:w-64' : 'h-16 w-full md:w-[66px]'}
         `}>
         <div className="p-4 pb-2 flex justify-between items-center">
           <div className={`flex items-center gap-2 overflow-hidden duration-500 transition-all ${expanded ? 'w-28' : ''}`}>

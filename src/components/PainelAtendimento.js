@@ -2,6 +2,7 @@
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
+import NovaSenha from './novaSenha.modal';
 
 const socket = io('https://vivamedapi.stevanini.com.br'); // Substitua pela URL do seu backend
 
@@ -11,21 +12,24 @@ function PainelConsultas() {
   const [tempoDecorrido, setTempoDecorrido] = useState(''); // Tempo em tempo real para o atendimento em andamento
   const [setor, setSetor] = useState('geral');
   const [sala, setSala] = useState('');
+  const [verNovaSenha, setVerNovaSenha] = useState(false);
+  const [novaSenha, setNovaSenha] = useState('');
 
   useEffect(() => {
     // Solicita a lista de consultas quando a página carrega
-    socket.emit('getTicketList');
+    socket.emit('getTicketList', data => setConsultas(data));
 
     // Atualiza a lista de consultas em tempo real
     socket.on('ticketListUpdated', (data) => {
       // Ordena consultas por data de criação para exibir em ordem de chegada
-      const consultasOrdenadas = data.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      const consultasOrdenadas = data.sort((a, b) => new Date(a.createdAt) + new Date(b.createdAt));
       setConsultas(consultasOrdenadas);
 
       // Define o atendimento atual
       const atendimentoEmAndamento = consultasOrdenadas.find(
         consulta => consulta.inicioAtendimento && !consulta.finalAtendimento
       );
+
       setAtendimentoAtual(atendimentoEmAndamento);
     });
 
@@ -70,7 +74,10 @@ function PainelConsultas() {
   };
 
   const gerarSenha = () => {
-    socket.emit('generateTicket');
+    socket.emit('generateTicket', data => {
+      setVerNovaSenha(!verNovaSenha)
+      setNovaSenha(data)
+    });
   };
 
   const consultorio = (sala) => {
@@ -78,15 +85,16 @@ function PainelConsultas() {
     setSetor('medico')
   };
 
+
   return (
-    <div className='w-full bg-allintra-primary-50 p-5'>
+    <div className='w-full bg-allintra-primary-50 p-5 overflow-hidden'>
       {
         setor == 'geral' && (
-          <div className='flex flex-col w-full justify-center items-center h-screen'>
-            <div className='grid grid-cols-1 sm:grid-cols-3 w-full sm:w-1/2 gap-3 mt-20'>
-              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-4xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => setSetor('recepcao')}>Recepção</button>
-              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-4xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => setSetor('atendimento')}>Atendimento</button>
-              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-4xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => setSetor('escolherconsultorio')}>Médico</button>
+          <div className='flex w-full justify-center items-center h-screen'>
+            <div className='grid grid-cols-1 sm:grid-cols-3 sm:w-1/2 gap-3'>
+              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => setSetor('recepcao')}>Recepção</button>
+              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => setSetor('atendimento')}>Atendimento</button>
+              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => setSetor('escolherconsultorio')}>Médico</button>
             </div>
           </div>
         )
@@ -94,14 +102,14 @@ function PainelConsultas() {
 
       {
         setor == 'escolherconsultorio' && (
-          <div className='flex flex-col w-full justify-center items-center h-screen'>
-            <div className='grid grid-cols-1 sm:grid-cols-3 w-full sm:w-1/2 gap-3 mt-20'>
-              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-4xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => consultorio('01')}>Consultório 01</button>
-              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-4xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => consultorio('02')}>Consultório 02</button>
-              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-4xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => consultorio('03')}>Consultório 03</button>
-              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-4xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => consultorio('04')}>Consultório 04</button>
-              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-4xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => consultorio('05')}>Consultório 05</button>
-              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-4xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => consultorio('06')}>Consultório 06</button>
+          <div className='flex w-full justify-center items-center h-screen'>
+            <div className='grid grid-cols-1 sm:grid-cols-3 sm:w-1/2 gap-3'>
+              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => consultorio('01')}>Consultório 01</button>
+              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => consultorio('02')}>Consultório 02</button>
+              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => consultorio('03')}>Consultório 03</button>
+              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => consultorio('04')}>Consultório 04</button>
+              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => consultorio('05')}>Consultório 05</button>
+              <button className='p-3 transition-all bg-allintra-primary-800 font-bold text-xl uppercase hover:bg-allintra-primary-700 hover:border-allintra-primary-50 border-allintra-primary-500 border rounded-md text-allintra-white-50 h-40 sm:h-96' onClick={() => consultorio('06')}>Consultório 06</button>
             </div>
           </div>
         )
@@ -121,10 +129,10 @@ function PainelConsultas() {
             </div>
           </div>
         ) : (
-          <div className='grid grid-cols-2 gap-5'>
+          <div className='grid grid-cols-3 gap-5 h-[850px]'>
             {/* Lista de Consultas Aguardando Atendimento */}
-            <div className='bg-allintra-white-50 rounded-md shadow-sm border border-allintra-primary-500 px-3 py-5 h-screen'>
-              <h2 className='text-2xl font-bold text-allintra-black-500 border-b pb-3 uppercase'>Consultas Aguardando Atendimento</h2>
+            <div className='bg-allintra-white-50 rounded-md shadow-sm border border-allintra-primary-500 px-3 pb-5 h-full overflow-auto'>
+              <h2 className='text-2xl font-bold text-allintra-black-500 border-b py-3 uppercase bg-white sticky top-0'>Consultas Aguardando Atendimento</h2>
               <ul className='py-3'>
                 {consultas.filter(consulta => !consulta.inicioAtendimento).map(consulta => (
                   <li key={consulta.id} className='mb-3 h-36 bg-allintra-primary-800 text-white flex justify-between items-center p-3 rounded-md border border-allintra-primary-500'>
@@ -138,8 +146,8 @@ function PainelConsultas() {
                       </div>
                       {setor == 'medico' && (
                         <div className='flex gap-2 w-full'>
-                          <button className='p-2 shadow-sm rounded-md w-1/2 bg-allintra-success-500/50 border-allintra-success-500 border' onClick={() => iniciarAtendimento(consulta.id, sala)}>OK</button>
-                          <button className='p-2 shadow-sm rounded-md w-1/2 bg-allintra-error-500/60 border-allintra-error-500 border' onClick={() => alert('Cancelar atendimento')}>X</button>
+                          <button className='p-2 shadow-sm rounded-md w-full bg-allintra-success-500/50 border-allintra-success-500 border' onClick={() => iniciarAtendimento(consulta.id, sala)}>Iniciar</button>
+                          {/* <button className='p-2 shadow-sm rounded-md w-1/2 bg-allintra-error-500/60 border-allintra-error-500 border' onClick={() => finalizarAtendimento(consulta.id)}>X</button> */}
                         </div>
                       )}
                     </div>
@@ -149,8 +157,8 @@ function PainelConsultas() {
             </div>
 
             {/* Atendimento em Andamento */}
-            <div className='bg-allintra-white-50 rounded-md shadow-sm border border-allintra-primary-500 px-3 py-5 h-screen'>
-              <h2 className='text-2xl font-semibold text-allintra-black-500 border-b pb-3 uppercase'>Em Atendimento</h2>
+            <div className='bg-allintra-white-50 rounded-md shadow-sm border border-allintra-primary-500 px-3 pb-5 h-screen overflow-auto'>
+              <h2 className='text-2xl font-semibold text-allintra-black-500 border-b py-3 uppercase sticky top-0 bg-white'>Em Atendimento</h2>
               {atendimentoAtual ? (
                 <div className='py-3'>
                   <div className='mb-3 h-36 bg-allintra-primary-800 text-white flex justify-between items-center p-3 rounded-md border border-allintra-primary-500'>
@@ -177,14 +185,14 @@ function PainelConsultas() {
             </div>
 
             {/* Consultas Finalizadas */}
-            <div className='bg-allintra-white-50 w-full rounded-md shadow-sm border border-allintra-primary-500 px-3 py-5 h-screen'>
-              <h2 className='text-2xl font-bold text-allintra-black-500 border-b pb-3 uppercase'>Consultas Finalizadas</h2>
-              <ul className='py-3'>
+            <div className='bg-allintra-white-50 h-screen overflow-auto w-full rounded-md shadow-sm border border-allintra-primary-500 px-3 pb-5'>
+              <h2 className='text-2xl font-bold text-allintra-black-500 border-b py-3 uppercase sticky top-0 bg-white'>Consultas Finalizadas</h2>
+              <ul className='py-3 overflow-hidden'>
                 {consultas.filter(consulta => consulta.finalAtendimento).map(consulta => (
                   <li key={consulta.id} className='mb-3 h-36 bg-allintra-primary-800 text-white flex justify-between items-center p-3 rounded-md border border-allintra-primary-500'>
                     <div className='flex justify-evenly w-full font-semibold text-xl'>
-                      <span className='flex flex-col text-center'>Início do atendimento: <span className='bg-white text-allintra-gray-700 rounded-md p-1'>{moment(consulta.inicioAtendimento).format("HH:mm")}</span></span>
-                      <span className='flex flex-col text-center border-l border-allintra-gray-500 px-3'>Fim do atendimento: <span className='bg-white text-allintra-gray-700 rounded-md p-1'>{moment(consulta.inicioAtendimento).format("HH:mm")}</span></span>
+                      <span className='flex flex-col text-center px-3'>Início do atendimento: <span className='bg-white text-allintra-gray-700 rounded-md p-1'>{moment(consulta.inicioAtendimento).format("HH:mm")}</span></span>
+                      <span className='flex flex-col text-center border-l border-allintra-gray-500 px-3'>Fim do atendimento: <span className='bg-white text-allintra-gray-700 rounded-md p-1'>{moment(consulta.finalAtendimento).format("HH:mm")}</span></span>
                       <span className='flex flex-col text-center border-l border-allintra-gray-500 px-3'>Tempo de atendimento: <span className='bg-white text-allintra-gray-700 rounded-md p-1'>{calcularDuracao(consulta.inicioAtendimento, consulta.finalAtendimento)}</span></span>
                     </div>
                     <div className='flex flex-col gap-2 w-28'>
@@ -199,6 +207,8 @@ function PainelConsultas() {
           </div>
         )
       }
+
+      <NovaSenha openAgenda={verNovaSenha} closeAgenda={setVerNovaSenha} info={novaSenha} />
     </div>
   );
 }

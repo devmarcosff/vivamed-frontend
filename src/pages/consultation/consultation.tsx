@@ -318,7 +318,7 @@ export default function Consultation() {
 
   return (
     <>
-      <div className="bg-white my-3 shadow-md rounded-md w-full max-h-full overflow-auto relative">
+      <div className="bg-gradient-to-br from-allintra-primary-800/35 to-allintra-primary-50 to-80% my-3 shadow-sm rounded-md w-full max-h-full overflow-auto relative">
         <div className="flex lg:flex-row justify-between items-center w-full top-0 p-5 gap-3 sticky bg-white shadow-sm z-10">
           <h2 className='font-semibold'>Consultas realizadas</h2>
           <div className='flex gap-3 w-full sm:w-[initial]'>
@@ -336,7 +336,7 @@ export default function Consultation() {
         {
           consultas.length ? (
             <div className='overflow-auto rounded-md shadow-sm m-3 mb-10'>
-              <table className="table-auto w-full">
+              <table className="table-auto w-full bg-white">
                 <thead className='bg-cyan-50 border-b-2 border-white'>
                   <tr>
                     <th className='py-5 px-2'>Prontuário</th>

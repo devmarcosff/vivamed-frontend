@@ -10,7 +10,7 @@ export default function Consultation() {
     <div className="flex">
       <SidebarTrue />
 
-      <div className="flex flex-wrap w-full mt-16 sm:my-0 px-3 overflow-hidden h-screen">
+      <div className="flex flex-wrap w-full mt-16 sm:my-0 px-3 overflow-hidden h-screen ">
         {/* <div className="w-full md:w-1/2 px-3 my-2">
           <AgendarConsulta />
         </div> */}

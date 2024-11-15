@@ -38,7 +38,8 @@
     ".next/types/**/*.ts",
     "src/app/teste/page.js",
     "src/components/editar.drawer.jsx",
-    "src/components/PainelAtendimento.js"
+    "src/components/PainelAtendimento.js",
+    "src/components/.modal.tsx"
   ],
   "exclude": [
     "node_modules"
