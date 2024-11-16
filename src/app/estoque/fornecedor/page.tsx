@@ -26,7 +26,6 @@ export default function Fornecedor() {
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/fornecedor`).then((res) => {
       setFornecedores(res.data)
-      console.log('entrei')
     }).catch(e => alert(e))
 
   }, [currentStep === 'cadastro'])
@@ -51,7 +50,7 @@ export default function Fornecedor() {
       cep: e.cep,
       state: e.state,
       num: e.num,
-      userId: userId,
+      userId: userId
     }
 
     {
@@ -65,6 +64,7 @@ export default function Fornecedor() {
           setShowSuccess('sucesso');
           setShowLoading(true)
           setUserId(cadastro.cnpj)
+          setCurrentStep('endereco');
           toast.success(`${e.data}`, {
             position: "bottom-right",
             autoClose: 5000,
@@ -93,9 +93,8 @@ export default function Fornecedor() {
           setTimeout(() => {
             setShowLoading(false)
             setShowSuccess('');
-            setCurrentStep('endereco');
             reset()
-          }, 2000)
+          }, 3000)
         })
       ) : (
         axios.post(`${process.env.NEXT_PUBLIC_API_URL}/address/criarfornecedor`, address, {
@@ -105,9 +104,7 @@ export default function Fornecedor() {
           },
         }).then((e) => {
           setShowSuccess('sucesso');
-          setCurrentStep('cadastro');
           setShowLoading(true)
-          setShowSuccess('');
           toast.success(`Endereço cadastrado com sucesso.`, {
             position: "bottom-right",
             autoClose: 5000,
@@ -118,6 +115,9 @@ export default function Fornecedor() {
             progress: undefined,
             theme: "light",
           });
+          setTimeout(() => {
+            setCurrentStep('cadastro');
+          }, 3000)
         }).catch(e => {
           setShowSuccess('erro');
           setShowMessage(e.response.data.message);
@@ -136,6 +136,7 @@ export default function Fornecedor() {
         }).finally(() => {
           setTimeout(() => {
             setShowLoading(false)
+            setShowSuccess('');
             reset()
           }, 3000)
         })
@@ -156,14 +157,14 @@ export default function Fornecedor() {
                 <AiOutlineLoading3Quarters className={`${showLoading && 'animate-spin'} h-4 w-4 text-allintra-success-500 mr-2`} />
                 {/* <FaCheck className={`h-4 w-4 text-allintra-success-500 mr-2`} /> */}
                 <div>
-                  <h3 className="text-sm font-medium text-green-800">Sucesso!</h3>
+                  <h3 className="text-sm font-medium text-green-800">Parabéns!!!</h3>
                   <p className="text-sm text-green-700">
-                    Fornecedor cadastrado com sucesso.
+                    Cadastrado realizado com sucesso.
                   </p>
                 </div>
               </div>
             </div>
-          ) : showSuccess == 'erro' ? (
+          ) : showSuccess == 'erro' && (
             <div className={`mb-4 p-4 h-full border border-allintra-error-500 bg-allintra-error-50 rounded-xl ${showLoading && 'animate-scaleIn'}`}>
               <div className="flex items-center">
                 <div className="relative">
@@ -176,8 +177,8 @@ export default function Fornecedor() {
                   </p>
                 </div>
               </div>
-            </div>) : ''
-          }
+            </div>
+          )}
 
           {
             currentStep == "cadastro" ? (
@@ -190,11 +191,10 @@ export default function Fornecedor() {
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="nome">Nome da Empresa / Razão Social</label>
                       <input
-                        {...register('nome')}
+                        {...register('nome', { required: 'Por favor preencha este campo' })}
                         className={`${errors.nome && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
                         id="nome"
                         placeholder="Nome da empresa"
-                        required
                       />
                     </div>
                     <div className="space-y-2">
@@ -212,7 +212,7 @@ export default function Fornecedor() {
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">Email</label>
                       <input
-                        {...register('email')}
+                        {...register('email', { required: 'Por favor preencha este campo' })}
                         className={`${errors.email && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
                         id="email"
                         type="email"
