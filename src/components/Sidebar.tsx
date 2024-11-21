@@ -1,7 +1,7 @@
 "use client"
 import Cookie from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
-import { BriefcaseMedical, ChevronDown, ChevronFirst, ChevronLast, ChevronUp, LayoutDashboard, Package, Stethoscope, Users } from 'lucide-react';
+import { Ambulance, BriefcaseMedical, ChevronDown, ChevronFirst, ChevronLast, ChevronUp, LayoutDashboard, Package, Stethoscope, Users } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -152,9 +152,13 @@ export const SidebarTrue = () => {
       {(role === "admin" || role === "coordenadorfarmacia" || role === "farmaceuticofarmacia" || role === "administrativofarmacia") && <hr className="my-3" />}
       {(role === "admin" || role === "medicofarmacia" || role === "farmaceuticofarmacia" || role === "coordenadorfarmacia" || role === "farmaceuticofarmacia" || role === "administrativofarmacia") && <SidebarItem icon={<Package size={20} />} text="Estoque" url={'/estoque'} />}
 
-      {/* Separação entre linha - Qualquer um pode acessar */}
+      {/*  */}
       <hr className="my-3" />
       {(role === "admin" || role === "coordenadorcaps" || role === "coordenadorfarmacia" || role === "administrativo") && <SidebarItem icon={<BriefcaseMedical size={20} />} text="Colaboradores" url={'/colaboradores'} />}
+
+      {/* Separação entre linha - Qualquer um pode acessar */}
+      <hr className="my-3" />
+      {(role === "admin" || role === "transporte") && <SidebarItem icon={<Ambulance size={20} />} text="Transporte" url={'/transporte'} />}
       <SidebarItem icon={<ImProfile size={20} />} text="Perfil" url={'/perfil'} />
 
       {/* <SidebarItem alert icon={<Boxes size={20} />} text="Atividade CAPS" subMenu>

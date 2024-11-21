@@ -3,12 +3,10 @@ import { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: 'Estoque - Vivamed'
+  title: 'Estoque - Vivamed | Bom Jesus do Itabapoana'
 }
 
 export default function Stock() {
-
-
   return (
     <div className="flex">
       <SidebarTrue />

@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 
 export default function Fornecedor() {
   const token = Cookie.get('accessToken')
-  const [currentStep, setCurrentStep] = useState<any>('cadastro');
+  const [currentStep, setCurrentStep] = useState<any>('');
   const [fornecedores, setFornecedores] = useState([]);
   const [showSuccess, setShowSuccess] = useState('');
   const [showMessage, setShowMessage] = useState('');
@@ -54,49 +54,7 @@ export default function Fornecedor() {
     }
 
     {
-      currentStep == 'cadastro' ? (
-        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/fornecedor`, cadastro, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-        }).then((e) => {
-          setShowSuccess('sucesso');
-          setShowLoading(true)
-          setUserId(cadastro.cnpj)
-          setCurrentStep('endereco');
-          toast.success(`${e.data}`, {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-        }).catch(e => {
-          setShowSuccess('erro');
-          setShowMessage(e.response.data.message);
-          setShowLoading(true)
-          toast.error(`Falha ao cadastrar fornecedor.`, {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-        }).finally(() => {
-          setTimeout(() => {
-            setShowLoading(false)
-            setShowSuccess('');
-            reset()
-          }, 3000)
-        })
-      ) : (
+      currentStep == 'endereco' ? (
         axios.post(`${process.env.NEXT_PUBLIC_API_URL}/address/criarfornecedor`, address, {
           headers: {
             'Content-Type': 'application/json',
@@ -140,6 +98,48 @@ export default function Fornecedor() {
             reset()
           }, 3000)
         })
+      ) : (
+        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/fornecedor`, cadastro, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+        }).then((e) => {
+          setShowSuccess('sucesso');
+          setShowLoading(true)
+          setUserId(cadastro.cnpj)
+          setCurrentStep('endereco');
+          toast.success(`${e.data}`, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }).catch(e => {
+          setShowSuccess('erro');
+          setShowMessage(e.response.data.message);
+          setShowLoading(true)
+          toast.error(`Falha ao cadastrar fornecedor.`, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }).finally(() => {
+          setTimeout(() => {
+            setShowLoading(false)
+            setShowSuccess('');
+          }, 3000)
+          reset()
+        })
       )
     }
   }
@@ -148,7 +148,7 @@ export default function Fornecedor() {
     <div className="flex">
       <SidebarTrue />
 
-      <div className="bg-gradient-to-br from-allintra-primary-800/35 to-allintra-primary-50 to-80% p-4 flex flex-col gap-4 w-full">
+      <div className="bg-gradient-to-br from-allintra-primary-800/35 to-allintra-primary-50 to-80% p-4 flex flex-col gap-4 w-full md:mt-0 mt-16">
         <div className="w-full flex flex-col">
 
           {showSuccess == 'sucesso' ? (
@@ -181,78 +181,7 @@ export default function Fornecedor() {
           )}
 
           {
-            currentStep == "cadastro" ? (
-              <Card
-                title="Cadastro de Fornecedor"
-                description="Insira as informações do fornecedor"
-              >
-                <form onSubmit={handleSubmit(handleSupplierSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-4 gap-4">
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="nome">Nome da Empresa / Razão Social</label>
-                      <input
-                        {...register('nome', { required: 'Por favor preencha este campo' })}
-                        className={`${errors.nome && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                        id="nome"
-                        placeholder="Nome da empresa"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="cnpj">CNPJ</label>
-                      <ReactInputMask
-                        {...register('cnpj', { required: 'Por favor preencha este campo' })}
-                        type='text'
-                        id="cnpj"
-                        mask="99.999.999/9999-99"
-                        placeholder="00.000.000/0000-00"
-                        required
-                        className={`${errors.cnpj && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">Email</label>
-                      <input
-                        {...register('email', { required: 'Por favor preencha este campo' })}
-                        className={`${errors.email && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                        id="email"
-                        type="email"
-                        placeholder="email@empresa.com"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="contato">Telefone</label>
-                      <ReactInputMask
-                        {...register('contato', { required: 'Por favor preencha este campo' })}
-                        type='text'
-                        id="contato"
-                        mask="(99) 99999-9999"
-                        placeholder="(00) 00000-0000"
-                        required
-                        className={`${errors.contato && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end">
-                    {
-                      !showLoading ? (
-                        <button type="submit" className="inline-flex w-full sm:w-36 justify-center rounded-xl bg-cyan-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3">
-                          Próximo
-                          <ChevronRight className="ml-2 h-4 w-4" />
-                        </button>
-                      ) : (
-                        <button type="submit" disabled className="inline-flex w-full sm:w-36 justify-center rounded-xl bg-cyan-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3">
-                          <>
-                            <AiOutlineLoading3Quarters className={`${showLoading && 'animate-spin'} h-4 w-4 text-white mr-2`} />
-                          </>
-                        </button>
-                      )
-                    }
-                  </div>
-                </form>
-              </Card>
-            ) : (
+            currentStep == "endereco" ? (
               <Card
                 title="Cadastro de Endereço"
                 description="Insira as informações do endereço"
@@ -346,11 +275,82 @@ export default function Fornecedor() {
                   </div>
                 </form>
               </Card>
+            ) : (
+              <Card
+                title="Cadastro de Fornecedor"
+                description="Insira as informações do fornecedor"
+              >
+                <form onSubmit={handleSubmit(handleSupplierSubmit)} className="space-y-4">
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="nome">Nome da Empresa / Razão Social</label>
+                      <input
+                        {...register('nome', { required: 'Por favor preencha este campo' })}
+                        className={`${errors.nome && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
+                        id="nome"
+                        placeholder="Nome da empresa"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="cnpj">CNPJ</label>
+                      <ReactInputMask
+                        {...register('cnpj', { required: 'Por favor preencha este campo' })}
+                        type='text'
+                        id="cnpj"
+                        mask="99.999.999/9999-99"
+                        placeholder="00.000.000/0000-00"
+                        required
+                        className={`${errors.cnpj && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">Email</label>
+                      <input
+                        {...register('email', { required: 'Por favor preencha este campo' })}
+                        className={`${errors.email && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
+                        id="email"
+                        type="email"
+                        placeholder="email@empresa.com"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="contato">Telefone</label>
+                      <ReactInputMask
+                        {...register('contato', { required: 'Por favor preencha este campo' })}
+                        type='text'
+                        id="contato"
+                        mask="(99) 99999-9999"
+                        placeholder="(00) 00000-0000"
+                        required
+                        className={`${errors.contato && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    {
+                      !showLoading ? (
+                        <button type="submit" className="inline-flex w-full sm:w-36 justify-center rounded-xl bg-cyan-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3">
+                          Próximo
+                          <ChevronRight className="ml-2 h-4 w-4" />
+                        </button>
+                      ) : (
+                        <button type="submit" disabled className="inline-flex w-full sm:w-36 justify-center rounded-xl bg-cyan-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3">
+                          <>
+                            <AiOutlineLoading3Quarters className={`${showLoading && 'animate-spin'} h-4 w-4 text-white mr-2`} />
+                          </>
+                        </button>
+                      )
+                    }
+                  </div>
+                </form>
+              </Card>
             )
           }
         </div>
 
-        <div className="w-full">
+        <div className="w-full h-full">
           <Card
             title="Lista de Fornecedores"
             description="Ver informações do fornecedor"
@@ -361,17 +361,17 @@ export default function Fornecedor() {
                   <table className="table-auto w-full bg-white">
                     <thead className='bg-cyan-50 border-b-2 border-white'>
                       <tr>
-                        <th className='py-5 px-2 text-left'>Nome da Empresa / Razão Social</th>
-                        <th className='py-5 px-2 text-left'>CNPJ</th>
-                        <th className='py-5 px-2 text-left'>E-mail</th>
-                        <th className='py-5 px-2 text-left'>Telefone</th>
-                        <th className='py-5 px-2 text-left'>Data de cadastro</th>
-                        <th className='py-5 px-2 text-center'>Entrar em contato</th>
+                        <th className='py-5 px-2 text-left text-nowrap border-r-2 border-white'>Nome da Empresa / Razão Social</th>
+                        <th className='py-5 px-2 text-left text-nowrap border-r-2 border-white'>CNPJ</th>
+                        <th className='py-5 px-2 text-left text-nowrap border-r-2 border-white'>E-mail</th>
+                        <th className='py-5 px-2 text-left text-nowrap border-r-2 border-white'>Telefone</th>
+                        <th className='py-5 px-2 text-left text-nowrap border-r-2 border-white'>Data de cadastro</th>
+                        <th className='py-5 px-2 text-center text-nowrap border-r-2 border-white'>Entrar em contato</th>
                       </tr>
                     </thead>
                     <tbody className='text-sm'>
                       {
-                        fornecedores?.map((item: any, index: any) => {
+                        fornecedores && Array.isArray(fornecedores) ? fornecedores?.map((item: any, index: any) => {
                           moment.locale('pt')
                           return (
                             <tr key={index} className={`animate-fadeIn group/item border-b border-slate-300 last:border-0 hover:bg-cyan-50 transition-all cursor-pointer`} onClick={() => console.log(item)}>
@@ -389,20 +389,28 @@ export default function Fornecedor() {
                               </th>
                             </tr>
                           )
-                        })
+                        }) :
+                          <tr className={`animate-fadeIn group/item border-b border-slate-300 last:border-0 hover:bg-cyan-50 transition-all cursor-pointer`}>
+                            <td className="px-3 py-3 group-hover/item:underline group-hover/item:text-cyan-500 text-nowrap truncate max-w-[200px]"></td>
+                            <td className="px-3 py-3 text-left group-hover/item:underline group-hover/item:text-cyan-500 text-nowrap truncate max-w-[120px]"></td>
+                            <th className="py-3 text-left max-w-44 truncate cursor-pointer"><span className='font-semibold text-gray-600'>Não existe fornecedores cadastrados</span></th>
+                            <th className="py-3 text-left max-w-44 truncate cursor-pointer"></th>
+                            <th className="py-3 text-left max-w-44 truncate cursor-pointer"></th>
+                            <th className="py-3 text-left max-w-44 truncate cursor-pointer"></th>
+                          </tr>
                       }
                     </tbody>
                   </table>
                 </div>
               ) : (
                 <div className='bg-cyan-50 py-5 border-white text-center m-3 rounded-xl shadow-sm'>
-                  <span className='font-semibold text-gray-600'>Não existe consultas agendadas</span>
+                  <span className='font-semibold text-gray-600'>Não existe fornecedores cadastrados</span>
                 </div>
               )
             }
           </Card>
         </div>
-      </div>
+      </div >
     </div >
   );
 }

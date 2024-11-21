@@ -9,7 +9,7 @@ import "./globals.css";
 const urbanist = Urbanist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Vivamed - Painel de controle'
+  title: 'Vivamed | Bom Jesus do Itabapoana'
 }
 
 export default function RootLayout({
