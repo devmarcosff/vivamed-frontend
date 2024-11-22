@@ -1,6 +1,5 @@
 "use client"
 
-import { SidebarTrue } from "@/components/Sidebar";
 import axios from "axios";
 import Cookie from 'js-cookie';
 import { ChevronRight } from "lucide-react";
@@ -13,7 +12,7 @@ import { FaCheck, FaLink, FaWhatsapp } from "react-icons/fa";
 import ReactInputMask from "react-input-mask";
 import { toast } from "react-toastify";
 
-export default function Fornecedor() {
+export default function TransportePage() {
   const token = Cookie.get('accessToken')
   const [currentStep, setCurrentStep] = useState<any>('');
   const [fornecedores, setFornecedores] = useState([]);
@@ -24,7 +23,7 @@ export default function Fornecedor() {
   const { register, handleSubmit, control, reset, formState: { errors, isSubmitting } } = useForm()
 
   useEffect(() => {
-    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/fornecedor`).then((res) => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/agendamento-transporte`).then((res) => {
       setFornecedores(res.data)
     }).catch(e => alert(e))
 
@@ -145,10 +144,8 @@ export default function Fornecedor() {
   }
 
   return (
-    <div className="flex">
-      <SidebarTrue />
-
-      <div className="bg-gradient-to-br from-allintra-primary-800/35 to-allintra-primary-50 to-80% p-4 flex flex-col gap-4 w-full md:mt-0 mt-16">
+    <div className="flex w-full p-4">
+      <div className="flex flex-col gap-4 w-full md:mt-0 mt-16">
         <div className="w-full flex flex-col">
 
           {showSuccess == 'sucesso' ? (
@@ -159,7 +156,7 @@ export default function Fornecedor() {
                 <div>
                   <h3 className="text-sm font-medium text-green-800">Parabéns!!!</h3>
                   <p className="text-sm text-green-700">
-                    Cadastrado realizado com sucesso.
+                    Agendamento realizado com sucesso.
                   </p>
                 </div>
               </div>
@@ -171,7 +168,7 @@ export default function Fornecedor() {
                   <AiOutlineLoading3Quarters className={`${showLoading && 'animate-spin'} h-4 w-4 text-allintra-error-500 mr-2`} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-allintra-error-500">Falha ao cadastrar fornecedor</h3>
+                  <h3 className="text-sm font-medium text-allintra-error-500">Falha ao agendar viagem</h3>
                   <p className="text-sm text-allintra-error-400">
                     {showMessage}
                   </p>
@@ -183,8 +180,8 @@ export default function Fornecedor() {
           {
             currentStep == "endereco" ? (
               <Card
-                title="Cadastro de Endereço"
-                description="Insira as informações do endereço"
+                title="Agendar viagem"
+                description="Insira as informações da viagem"
               >
                 <form onSubmit={handleSubmit(handleSupplierSubmit)} className="space-y-4">
                   <div className="grid grid-cols-3 gap-4">
@@ -277,8 +274,8 @@ export default function Fornecedor() {
               </Card>
             ) : (
               <Card
-                title="Cadastro de Fornecedor"
-                description="Insira as informações do fornecedor"
+                title="Agendar viagem"
+                description="Insira as informações da viagem"
               >
                 <form onSubmit={handleSubmit(handleSupplierSubmit)} className="space-y-4">
                   <div className="grid grid-cols-4 gap-4">
@@ -352,8 +349,8 @@ export default function Fornecedor() {
 
         <div className="w-full h-full">
           <Card
-            title="Lista de Fornecedores"
-            description="Ver informações do fornecedor"
+            title="Lista de agendamentos"
+            description="Ver informações dos agendamentos"
           >
             {
               fornecedores.length ? (
