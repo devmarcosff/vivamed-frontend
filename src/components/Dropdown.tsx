@@ -10,7 +10,7 @@ import { SidebarDropdown } from './Sidebar'
 
 export default function Dropdown() {
   const { push } = useRouter()
-  const { name, idEnf, expanded } = useContext(SidebarDropdown)
+  const { email, idEnf, expanded } = useContext(SidebarDropdown)
 
   const roleUser = (role: any) => {
     if (role === 'coordenadorfarmacia' || role === 'coordenadorcaps') {
@@ -32,9 +32,9 @@ export default function Dropdown() {
 
       <MenuButton className={`inline-flex w-full justify-center gap-x-1.5 rounded-md ${expanded ? 'px-3 py-2 hover:bg-cyan-100' : 'px-0'} text-sm font-semibold text-gray-900 transition-all`}>
         <div className={`flex gap-3 justify-between items-center overflow-hidden transition-all`}>
-          <img src={`https://ui-avatars.com/api/?name=${name}&background=e0f7fa&color=00838f&bold=true`} className="w-10 h-10 rounded-md hover:-translate-y-1 transition-all" alt="" />
+          <img src={`https://ui-avatars.com/api/?name=${email}&background=e0f7fa&color=00838f&bold=true`} className="w-10 h-10 rounded-md hover:-translate-y-1 transition-all" alt="" />
           <div>
-            <h4 className="font-semibold capitalize">{name}</h4>
+            <h4 className="font-semibold capitalize">{email}</h4>
             <span className="text-xs text-gray-600 capitalize">Função: {roleUser(idEnf)}</span>
           </div>
           <ChevronUpIcon aria-hidden="true" className="h-5 w-5 text-gray-600" />

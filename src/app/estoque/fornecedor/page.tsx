@@ -24,8 +24,12 @@ export default function Fornecedor() {
   const { register, handleSubmit, control, reset, formState: { errors, isSubmitting } } = useForm()
 
   useEffect(() => {
-    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/fornecedor`).then((res) => {
-      setFornecedores(res.data)
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/v2/firms`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).then((res) => {
+      setFornecedores(res.data.items)
     }).catch(e => alert(e))
 
   }, [currentStep === 'cadastro'])
@@ -43,19 +47,31 @@ export default function Fornecedor() {
   );
 
   const handleSupplierSubmit = (e: any) => {
-    const cadastro = { nome: e.nome, cnpj: e.cnpj, email: e.email, contato: e.contato }
+    const cadastro = {
+      businessName: e.businessName,
+      cnpj: e.cnpj,
+      email: e.email,
+      phone: e.contato,
+      tradeName: "",
+      stateRegistration: "RJ",
+      municipalRegistration: "Bom Jesus do Itabapoana"
+    }
     const address = {
       street: e.street,
       city: e.city,
-      cep: e.cep,
+      zipcode: e.cep,
       state: e.state,
-      num: e.num,
-      userId: userId
+      neighborhood: 'Bairro',
+      number: e.num,
+      complement: "complement",
+      latitude: 0,
+      longitude: 0,
+      firmId: userId
     }
 
     {
       currentStep == 'endereco' ? (
-        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/address/criarfornecedor`, address, {
+        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/v2/address`, address, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -99,7 +115,7 @@ export default function Fornecedor() {
           }, 3000)
         })
       ) : (
-        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/fornecedor`, cadastro, {
+        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/v2/firms`, cadastro, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -107,7 +123,7 @@ export default function Fornecedor() {
         }).then((e) => {
           setShowSuccess('sucesso');
           setShowLoading(true)
-          setUserId(cadastro.cnpj)
+          setUserId(e.data.id)
           setCurrentStep('endereco');
           toast.success(`${e.data}`, {
             position: "bottom-right",
@@ -285,8 +301,8 @@ export default function Fornecedor() {
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="nome">Nome da Empresa / Razão Social</label>
                       <input
-                        {...register('nome', { required: 'Por favor preencha este campo' })}
-                        className={`${errors.nome && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
+                        {...register('businessName', { required: 'Por favor preencha este campo' })}
+                        className={`${errors.businessName && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
                         id="nome"
                         placeholder="Nome da empresa"
                       />
@@ -375,7 +391,7 @@ export default function Fornecedor() {
                           moment.locale('pt')
                           return (
                             <tr key={index} className={`animate-fadeIn group/item border-b border-slate-300 last:border-0 hover:bg-cyan-50 transition-all cursor-pointer`} onClick={() => console.log(item)}>
-                              <td className="px-3 py-3 group-hover/item:underline group-hover/item:text-cyan-500 text-nowrap truncate max-w-[200px]">{item.nome}</td>
+                              <td className="px-3 py-3 group-hover/item:underline group-hover/item:text-cyan-500 text-nowrap truncate max-w-[200px]">{item.email}</td>
                               <td className="px-3 py-3 text-left group-hover/item:underline group-hover/item:text-cyan-500 text-nowrap truncate max-w-[120px]">{item.cnpj}</td>
                               <th className="py-3 text-left max-w-44 truncate cursor-pointer">{item.email || "-"}</th>
                               <th className="py-3 text-left max-w-44 truncate cursor-pointer">{item.contato || "-"}</th>

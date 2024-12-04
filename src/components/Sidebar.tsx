@@ -1,5 +1,5 @@
 "use client"
-import Cookie from 'js-cookie';
+import Cookie from "js-cookie";
 import { jwtDecode } from 'jwt-decode';
 import { Ambulance, BriefcaseMedical, ChevronDown, ChevronFirst, ChevronLast, ChevronUp, LayoutDashboard, Package, Stethoscope, Users } from 'lucide-react';
 import Image from "next/image";
@@ -15,9 +15,8 @@ const SidebarContext = createContext<any>(true)
 export const SidebarDropdown = createContext<any>(null)
 
 interface CadastroCidadao {
-  name: string,
-  role: string,
-  idProf: string
+  email: string,
+  role: string
 }
 
 // SIDEBAR
@@ -26,19 +25,14 @@ export function Sidebar({ children }: string | any) {
   const [expanded, setExpanded] = useState<any>()
 
   useEffect(() => {
+    const token = Cookie.get('accessToken');
+    setUser(jwtDecode(`${token}`))
+  }, [])
+
+  useEffect(() => {
     // Apenas no lado do cliente
     const expandedMenu = localStorage.getItem('expandedMenu');
     setExpanded(expandedMenu == 'true' ? true : false);
-
-    // Verifica se está no lado do cliente
-    if (typeof window !== 'undefined') {
-      const token = Cookie.get('accessToken');
-      if (token) {
-        const decoded = jwtDecode<CadastroCidadao>(`${token}`)
-        Cookie.set('authRole', decoded.role);
-        setUser(decoded);
-      }
-    }
   }, []);
 
   return (
@@ -63,7 +57,7 @@ export function Sidebar({ children }: string | any) {
         <SidebarContext.Provider value={{ expanded, setExpanded }}>
           <ul className={`flex-1 px-3 ${expanded ? 'py-5' : 'hidden md:block'}`}>{children}</ul>
           {user && (
-            <SidebarDropdown.Provider value={{ name: user?.name, idEnf: user.role, expanded }}>
+            <SidebarDropdown.Provider value={{ email: user?.email, role: user.role, expanded }}>
               <div className={`border-t flex p-3 ${expanded ? '' : 'hidden md:block'}`}>
                 <Dropdown />
               </div>

@@ -1,6 +1,7 @@
 "use client";
 import { message } from 'antd';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { setCookie } from 'nookies';
@@ -18,10 +19,16 @@ interface Inputs {
   password: string
 }
 
+interface UserV2JwtPayload {
+  name: string,
+  role: string
+}
+
 export default function Login() {
   const [messageApi, contextHolder] = message.useMessage();
   const [isPassword, setIsPassword] = useState<any>(true)
   const [loading, setLoading] = useState<boolean>(false)
+  const [decoded, setUser] = useState<any>([])
   const {
     register,
     handleSubmit,
@@ -32,11 +39,12 @@ export default function Login() {
 
   const onSubmit: SubmitHandler<Inputs> = async ({ username, password }) => {
     // // AUTENTICAÇÃO DE USUÁRIO *TROCAR A URL DA .ENV*
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/v2/auth/login`, {
       username: username,
       password: password
     }).then(res => {
       setCookie(null, 'accessToken', res.data.access_token)
+      setCookie(null, 'authRole', jwtDecode<UserV2JwtPayload>(res.data.access_token).role)
       toast.success('Usuário conectado', {
         position: "bottom-right",
         autoClose: 5000,
@@ -48,10 +56,11 @@ export default function Login() {
         theme: "light",
       });
       push('/')
-      axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/user/active/${username}`, {})
-        .then()
-        .catch(e => alert('Aconteceu algum erro ao atualizar a ativação do usuário.'))
+      // axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/user/active/${username}`, {})
+      //   .then()
+      //   .catch(e => alert('Aconteceu algum erro ao atualizar a ativação do usuário.'))
     }).catch(err => {
+      console.log(err)
       toast.error('Usuário ou senha inválido.', {
         position: "bottom-right",
         autoClose: 5000,
