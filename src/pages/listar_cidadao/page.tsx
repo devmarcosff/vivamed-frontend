@@ -245,7 +245,7 @@ export default function ListarCidadao() {
             </div>
           </div>
         </Drawer.Content>
-      </Drawer.Root >
+      </Drawer.Root>
 
       <ModalCidadao openModal={open} closeModal={setOpen} senhaCidadao={senhaCidadao} />
     </>

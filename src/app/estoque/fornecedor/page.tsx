@@ -1,44 +1,86 @@
 "use client"
 
 import { SidebarTrue } from "@/components/Sidebar";
+import { BoxInfo } from "@/components/stylesComponents/molecules/BoxInfo";
+import { Drawer } from "@/components/stylesComponents/organisms/Drawer";
+import { DialogTitle } from "@radix-ui/react-dialog";
 import axios from "axios";
 import Cookie from 'js-cookie';
-import { ChevronRight } from "lucide-react";
+import { Plus } from "lucide-react";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsFillTelephoneFill } from "react-icons/bs";
-import { FaCheck, FaLink, FaWhatsapp } from "react-icons/fa";
-import ReactInputMask from "react-input-mask";
+import { FaLink, FaWhatsapp } from "react-icons/fa";
+import { IoIosInformationCircleOutline, IoMdAddCircleOutline, IoMdPrint } from "react-icons/io";
+import { MdDelete, MdModeEditOutline } from "react-icons/md";
 import { toast } from "react-toastify";
+
+interface IFirm {
+  // Firm
+  businessName?: string;
+  cnpj?: string;
+  email?: string;
+  phone?: string;
+  // tradeName:
+  // stateRegistration:
+  // municipalRegistration:
+
+  // Firm Address
+  street?: string;
+  city?: string;
+  neighborhood?: string;
+  number: number;
+  zipcode?: string
+  state?: string;
+  complement?: string;
+  latitude?: string;
+  longitude?: string;
+  firmId?: string;
+}
 
 export default function Fornecedor() {
   const token = Cookie.get('accessToken')
-  const [currentStep, setCurrentStep] = useState<any>('');
   const [fornecedores, setFornecedores] = useState([]);
-  const [showSuccess, setShowSuccess] = useState('');
-  const [showMessage, setShowMessage] = useState('');
-  const [userId, setUserId] = useState<any>();
-  const [showLoading, setShowLoading] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [isFornecedor, setIsFornecedor] = useState<any>([]);
   const { register, handleSubmit, control, reset, formState: { errors, isSubmitting } } = useForm()
+  var isFornecedorTrue = isFornecedor.length
 
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/v2/firms`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       }
     }).then((res) => {
       setFornecedores(res.data.items)
     }).catch(e => alert(e))
 
-  }, [currentStep === 'cadastro'])
+  }, [drawer == false])
+
+  const removerMedicamento = (indexToRemove: any) => {
+    setIsFornecedor((prevState: any) => prevState.filter((_: any, index: any) => index !== indexToRemove));
+  };
+
+  const adicionarMedicamento = () => {
+    const novoMedicamento = {};
+    setIsFornecedor((prevState: any) => [...prevState, novoMedicamento]);
+  };
 
   const Card = ({ title, description, children }: any) => (
     <div className="bg-white rounded-xl shadow-sm border border-allintra-primary-50 h-full">
-      <div className="p-6">
-        <h2 className="text-xl font-semibold text-allintra-black-500">{title}</h2>
-        <p className="mt-1 text-sm text-allintra-gray-700">{description}</p>
+      <div className="p-6 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-allintra-black-500">{title}</h2>
+          <p className="mt-1 text-sm text-allintra-gray-700">{description}</p>
+        </div>
+        <div>
+          <button type="submit" onClick={() => setDrawer(true)} className="flex w-full group/firm sm:w-36 justify-center items-center rounded-xl bg-cyan-800 transition-all px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3">
+            Fornecedor
+            <Plus className="ml-2 h-4 w-4 transition-all group-hover/firm:rotate-90" />
+          </button>
+        </div>
       </div>
       <div className="px-6 pb-6">
         {children}
@@ -46,40 +88,45 @@ export default function Fornecedor() {
     </div>
   );
 
-  const handleSupplierSubmit = (e: any) => {
-    const cadastro = {
-      businessName: e.businessName,
-      cnpj: e.cnpj,
-      email: e.email,
-      phone: e.contato,
-      tradeName: "",
-      stateRegistration: "RJ",
-      municipalRegistration: "Bom Jesus do Itabapoana"
-    }
-    const address = {
-      street: e.street,
-      city: e.city,
-      zipcode: e.cep,
-      state: e.state,
-      neighborhood: 'Bairro',
-      number: e.num,
-      complement: "complement",
-      latitude: 0,
-      longitude: 0,
-      firmId: userId
+  const inserirFirm = async (data: any) => {
+    const firm = {
+      businessName: data.businessName,
+      cnpj: data.cnpj,
+      email: data.email,
+      phone: data.phone
     }
 
-    {
-      currentStep == 'endereco' ? (
-        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/v2/address`, address, {
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/v2/firms`, firm, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    }).then(e => {
+      const id = e.data.id;
+      const firmAddress = {
+        street: data.street,
+        city: data.city,
+        neighborhood: data.neighborhood,
+        number: data.number,
+        zipcode: data.zipcode,
+        state: data.state,
+        complement: data.complement,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        firmId: id
+      }
+
+      reset()
+      setDrawer(false)
+
+      if (data.street) {
+        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/v2/address`, firmAddress, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-        }).then((e) => {
-          setShowSuccess('sucesso');
-          setShowLoading(true)
-          toast.success(`Endereço cadastrado com sucesso.`, {
+        }).then().catch(e => {
+          toast.error("Erro ao adicionar endereço", {
             position: "bottom-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -89,75 +136,31 @@ export default function Fornecedor() {
             progress: undefined,
             theme: "light",
           });
-          setTimeout(() => {
-            setCurrentStep('cadastro');
-          }, 3000)
-        }).catch(e => {
-          setShowSuccess('erro');
-          setShowMessage(e.response.data.message);
-          setShowLoading(true)
-          reset()
-          toast.error(`${e.response.data.message}`, {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-        }).finally(() => {
-          setTimeout(() => {
-            setShowLoading(false)
-            setShowSuccess('');
-            reset()
-          }, 3000)
         })
-      ) : (
-        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/v2/firms`, cadastro, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-        }).then((e) => {
-          setShowSuccess('sucesso');
-          setShowLoading(true)
-          setUserId(e.data.id)
-          setCurrentStep('endereco');
-          toast.success(`${e.data}`, {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-        }).catch(e => {
-          setShowSuccess('erro');
-          setShowMessage(e.response.data.message);
-          setShowLoading(true)
-          toast.error(`Falha ao cadastrar fornecedor.`, {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-        }).finally(() => {
-          setTimeout(() => {
-            setShowLoading(false)
-            setShowSuccess('');
-          }, 3000)
-          reset()
-        })
-      )
-    }
+      }
+
+      toast.success("Fornecedor cadastrado com sucesso.", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+
+    }).catch(e =>
+      toast.error(`${e.response.data.message}`, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      }))
   }
 
   return (
@@ -165,207 +168,6 @@ export default function Fornecedor() {
       <SidebarTrue />
 
       <div className="bg-gradient-to-br from-allintra-primary-800/35 to-allintra-primary-50 to-80% p-4 flex flex-col gap-4 w-full md:mt-0 mt-16">
-        <div className="w-full flex flex-col">
-
-          {showSuccess == 'sucesso' ? (
-            <div className={`mb-4 p-4 h-full border ${showLoading && 'animate-scaleIn'} border-green-200 bg-green-50 rounded-xl`}>
-              <div className="flex items-center">
-                <AiOutlineLoading3Quarters className={`${showLoading && 'animate-spin'} h-4 w-4 text-allintra-success-500 mr-2`} />
-                {/* <FaCheck className={`h-4 w-4 text-allintra-success-500 mr-2`} /> */}
-                <div>
-                  <h3 className="text-sm font-medium text-green-800">Parabéns!!!</h3>
-                  <p className="text-sm text-green-700">
-                    Cadastrado realizado com sucesso.
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : showSuccess == 'erro' && (
-            <div className={`mb-4 p-4 h-full border border-allintra-error-500 bg-allintra-error-50 rounded-xl ${showLoading && 'animate-scaleIn'}`}>
-              <div className="flex items-center">
-                <div className="relative">
-                  <AiOutlineLoading3Quarters className={`${showLoading && 'animate-spin'} h-4 w-4 text-allintra-error-500 mr-2`} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-allintra-error-500">Falha ao cadastrar fornecedor</h3>
-                  <p className="text-sm text-allintra-error-400">
-                    {showMessage}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {
-            currentStep == "endereco" ? (
-              <Card
-                title="Cadastro de Endereço"
-                description="Insira as informações do endereço"
-              >
-                <form onSubmit={handleSubmit(handleSupplierSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="street">Rua / Logadouro</label>
-                      <input
-                        {...register('street')}
-                        className={`${errors.street && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                        id="street"
-                        type="text"
-                        placeholder="Rua da empresa"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="city">Cidade</label>
-                      <input
-                        {...register('city', { required: 'Por favor preencha este campo' })}
-                        type='text'
-                        id="city"
-                        placeholder="Bom Jesus do Itabapoana"
-                        required
-                        className={`${errors.city && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="state">Estado</label >
-                      <input
-                        {...register('state', { required: 'Por favor preencha este campo' })}
-                        type='text'
-                        id="state"
-                        placeholder="Rio de Janeiro"
-                        required
-                        className={`${errors.state && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="cep">CEP</label >
-                      <input
-                        {...register('cep')}
-                        className={`${errors.cep && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                        id="cep"
-                        type="text"
-                        placeholder="28360-000"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="num">Número</label >
-                      <input
-                        {...register('num')}
-                        className={`${errors.num && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                        id="num"
-                        type="text"
-                        placeholder="28360-000"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="userId">Fornecedor</label >
-                      <input
-                        {...register('userId')}
-                        className={`${errors.userId && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                        id="userId"
-                        value={userId}
-                        type="text"
-                        placeholder={`${userId}`}
-                        disabled
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end">
-                    {
-                      !showLoading ? (
-                        <button type="submit" className="inline-flex w-full sm:w-36 justify-center rounded-xl bg-cyan-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3">
-                          Finalizar
-                          <FaCheck className="ml-2 h-4 w-4" />
-                        </button>
-                      ) : (
-                        <button type="submit" disabled className="inline-flex w-full sm:w-36 justify-center rounded-xl bg-cyan-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3">
-                          <>
-                            <AiOutlineLoading3Quarters className={`${showLoading && 'animate-spin'} h-4 w-4 text-white mr-2`} />
-                          </>
-                        </button>
-                      )
-                    }
-                  </div>
-                </form>
-              </Card>
-            ) : (
-              <Card
-                title="Cadastro de Fornecedor"
-                description="Insira as informações do fornecedor"
-              >
-                <form onSubmit={handleSubmit(handleSupplierSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-4 gap-4">
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="nome">Nome da Empresa / Razão Social</label>
-                      <input
-                        {...register('businessName', { required: 'Por favor preencha este campo' })}
-                        className={`${errors.businessName && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                        id="nome"
-                        placeholder="Nome da empresa"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="cnpj">CNPJ</label>
-                      <ReactInputMask
-                        {...register('cnpj', { required: 'Por favor preencha este campo' })}
-                        type='text'
-                        id="cnpj"
-                        mask="99.999.999/9999-99"
-                        placeholder="00.000.000/0000-00"
-                        required
-                        className={`${errors.cnpj && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">Email</label>
-                      <input
-                        {...register('email', { required: 'Por favor preencha este campo' })}
-                        className={`${errors.email && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                        id="email"
-                        type="email"
-                        placeholder="email@empresa.com"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="contato">Telefone</label>
-                      <ReactInputMask
-                        {...register('contato', { required: 'Por favor preencha este campo' })}
-                        type='text'
-                        id="contato"
-                        mask="(99) 99999-9999"
-                        placeholder="(00) 00000-0000"
-                        required
-                        className={`${errors.contato && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded-xl py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end">
-                    {
-                      !showLoading ? (
-                        <button type="submit" className="inline-flex w-full sm:w-36 justify-center rounded-xl bg-cyan-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3">
-                          Próximo
-                          <ChevronRight className="ml-2 h-4 w-4" />
-                        </button>
-                      ) : (
-                        <button type="submit" disabled className="inline-flex w-full sm:w-36 justify-center rounded-xl bg-cyan-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3">
-                          <>
-                            <AiOutlineLoading3Quarters className={`${showLoading && 'animate-spin'} h-4 w-4 text-white mr-2`} />
-                          </>
-                        </button>
-                      )
-                    }
-                  </div>
-                </form>
-              </Card>
-            )
-          }
-        </div>
-
         <div className="w-full h-full">
           <Card
             title="Lista de Fornecedores"
@@ -373,7 +175,7 @@ export default function Fornecedor() {
           >
             {
               fornecedores.length ? (
-                <div className='overflow-auto rounded-xl shadow-sm'>
+                <div className='overflow-auto rounded-xl shadow-md'>
                   <table className="table-auto w-full bg-white">
                     <thead className='bg-cyan-50 border-b-2 border-white'>
                       <tr>
@@ -391,10 +193,10 @@ export default function Fornecedor() {
                           moment.locale('pt')
                           return (
                             <tr key={index} className={`animate-fadeIn group/item border-b border-slate-300 last:border-0 hover:bg-cyan-50 transition-all cursor-pointer`} onClick={() => console.log(item)}>
-                              <td className="px-3 py-3 group-hover/item:underline group-hover/item:text-cyan-500 text-nowrap truncate max-w-[200px]">{item.email}</td>
+                              <td className="px-3 py-3 group-hover/item:underline group-hover/item:text-cyan-500 text-nowrap truncate max-w-[200px]">{item.businessName}</td>
                               <td className="px-3 py-3 text-left group-hover/item:underline group-hover/item:text-cyan-500 text-nowrap truncate max-w-[120px]">{item.cnpj}</td>
                               <th className="py-3 text-left max-w-44 truncate cursor-pointer">{item.email || "-"}</th>
-                              <th className="py-3 text-left max-w-44 truncate cursor-pointer">{item.contato || "-"}</th>
+                              <th className="py-3 text-left max-w-44 truncate cursor-pointer">{item.phone || "-"}</th>
                               <th className="py-3 text-left max-w-44 truncate cursor-pointer">{moment(item.createAt).format('DD/MM/YYYY - HH:mm') || "-"}</th>
                               <th className="py-3 text-left max-w-44 truncate cursor-pointer">
                                 <div className="flex gap-2 items-center justify-center">
@@ -426,7 +228,219 @@ export default function Fornecedor() {
             }
           </Card>
         </div>
-      </div >
-    </div >
+      </div>
+
+      {/* Drawer Inserir Consulta */}
+      <Drawer.Root open={drawer == true} onOpenChange={() => setDrawer(false)} >
+        <Drawer.Content className="2xl:w-[85%]">
+          <>
+            <div className='shadow-md bg-white rounded-md overflow-auto border mb-3 flex flex-col justify-between relative'>
+              <div>
+                <div className='flex justify-between items-center p-4 sticky top-0 bg-allintra-white-50 shadow-sm'>
+                  <h2 className='font-semibold text-allintra-gray-700'>Preencha os dados do fornecedor</h2>
+                </div>
+
+                <form className="w-full"
+                  onSubmit={handleSubmit(inserirFirm)}
+                >
+                  <div className="flex flex-wrap p-5 text-left justify-between">
+                    <div className="w-full md:w-1/2 px-3 mb-6 md:mb-3">
+                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="businessName">
+                        Nome da Empresa / Razão Social*
+                      </label>
+                      <input {...register('businessName')} id="businessName" placeholder="Stevanini LTDA" className={`shadow-sm block w-full bg-white text-gray-700 border rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} type="text" />
+                      {
+                        errors.businessName && <p className="text-red-500 text-xs italic">Por favor selecione um colaborador</p>
+                      }
+                    </div>
+                    <div className="w-full md:w-1/2 px-3 mb-6 md:mb-3">
+                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                        CNPJ*
+                      </label>
+                      <input {...register('cnpj')} id="cnpj" placeholder="XX.XXX.XXX/0001-XX" className={`shadow-sm block w-full bg-white text-gray-700 border rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} type="text" />
+                      {
+                        errors.paciente && <p className="text-red-500 text-xs italic">Por favor selecione um colaborador</p>
+                      }
+                    </div>
+                    <div className="w-full md:w-1/2 px-3 mb-6 md:mb-3">
+                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                        Email*
+                      </label>
+                      <input {...register('email')} id="email" placeholder="email@email.com" className={`shadow-sm block w-full bg-white text-gray-700 border rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} type="text" />
+                      {
+                        errors.paciente && <p className="text-red-500 text-xs italic">Por favor selecione um colaborador</p>
+                      }
+                    </div>
+                    <div className="w-full md:w-1/2 px-3 mb-6 md:mb-3">
+                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
+                        Telefone*
+                      </label>
+                      <input {...register('phone')} id="phone" placeholder="(00) 00000-0000" className={`shadow-sm block w-full bg-white text-gray-700 border rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} type="text" />
+                      {
+                        errors.paciente && <p className="text-red-500 text-xs italic">Por favor selecione um colaborador</p>
+                      }
+                    </div>
+
+                    {/* ADICIONAR MEDICAMENTOS */}
+                    {!isFornecedorTrue && (
+                      <div className="w-full px-3 mb-3 py-3 border-t md:mb-0">
+                        <button type="button" onClick={adicionarMedicamento}>
+                          <span className='flex gap-2 items-center text-allintra-gray-700 font-semibold'><IoMdAddCircleOutline /> Adicionar endereço</span>
+                        </button>
+                      </div>
+                    )}
+                    {isFornecedor?.map((item: any, index: any) => (
+                      <div className='w-full flex flex-wrap my-4 relative' key={index}>
+                        <div className="w-full sm:w-1/2 px-3 py-3 border-t md:mb-0">
+                          <div>
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="street">
+                              Rua / Logadouro
+                            </label>
+                            <input
+                              // onChange={e => handleInputChange(index, 'street', e.target.value)}
+                              type='text'
+                              placeholder='Rua da empresa'
+                              {...register('street')}
+                              id="street"
+                              name="street"
+                              className={`${errors.street && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
+                            {
+                              errors.street && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                            }
+                          </div>
+                        </div>
+                        <div className="w-full sm:w-1/2 px-3 py-3 border-t md:mb-0">
+                          <div>
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="city">
+                              Cidade
+                            </label>
+                            <input
+                              // onChange={e => handleInputChange(index, 'cidade', e.target.value)}
+                              type='text'
+                              placeholder='Cidade da empresa'
+                              {...register('city')}
+                              id="city"
+                              name="city"
+                              className={`${errors.city && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
+                            {
+                              errors.city && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                            }
+                          </div>
+                        </div>
+                        <div className="w-full sm:w-1/2 px-3 py-3 border-t md:mb-0">
+                          <div>
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="neighborhood">
+                              Bairro
+                            </label>
+                            <input
+                              // onChange={e => handleInputChange(index, 'cidade', e.target.value)}
+                              type='text'
+                              placeholder='Cidade da empresa'
+                              {...register('neighborhood')}
+                              id="neighborhood"
+                              name="neighborhood"
+                              className={`${errors.neighborhood && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
+                            {
+                              errors.neighborhood && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                            }
+                          </div>
+                        </div>
+                        <div className="w-full sm:w-1/2 px-3 py-3 md:mb-0">
+                          <div>
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="number">
+                              Número
+                            </label>
+                            <input
+                              // onChange={e => handleInputChange(index, 'number', e.target.value)}
+                              type='text'
+                              placeholder='60'
+                              {...register('number')}
+                              id="number"
+                              name="number"
+                              className={`${errors.number && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
+                            {
+                              errors.number && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                            }
+                          </div>
+                        </div>
+                        <div className="w-full sm:w-1/2 px-3 py-3 md:mb-0">
+                          <div>
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="zipcode">
+                              CEP
+                            </label>
+                            <input
+                              // onChange={e => handleInputChange(index, 'zipcode', e.target.value)}
+                              type='text'
+                              placeholder='28360-000'
+                              {...register('zipcode')}
+                              id="zipcode"
+                              name="zipcode"
+                              className={`${errors.zipcode && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
+                            {
+                              errors.zipcode && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                            }
+                          </div>
+                        </div>
+                        <div className="w-full sm:w-1/2 px-3 py-3 md:mb-0">
+                          <div>
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="state">
+                              UF
+                            </label>
+                            <input
+                              // onChange={e => handleInputChange(index, 'state', e.target.value)}
+                              type='text'
+                              placeholder='Estado da empresa'
+                              {...register('state')}
+                              id="state"
+                              name="state"
+                              className={`${errors.state && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
+                            {
+                              errors.state && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                            }
+                          </div>
+                        </div>
+                        <div className="w-full px-3 py-3 md:mb-0">
+                          <div>
+                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="complement">
+                              Complemento
+                            </label>
+                            <textarea id="complement" {...register('complement')} className={`${errors.complement && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
+                            {
+                              errors.complement && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
+                            }
+                          </div>
+                        </div>
+                        <div className="w-full px-3 md:mb-0 py-1">
+                          <button
+                            type="button"
+                            onClick={() => removerMedicamento(index)}
+                            className="
+                                  absolute top-2 right-3 p-1
+                                  text-allintra-error-500 border border-allintra-error-500 bg-allintra-error-50 hover:bg-allintra-error-500 hover:text-white transition-all text-sm font-semibold shadow-sm rounded"
+                          ><MdDelete /></button>
+                        </div>
+                      </div>
+                    ))}
+
+                  </div>
+                  <div className='flex sm:flex-row sm:justify-between flex-col-reverse justify-end items-center w-full gap-3 bg-allintra-gray-300 px-4 py-2 sticky bottom-0 left-0'>
+                    <span className='text-allintra-gray-600 text-sm truncate w-full hidden sm:flex'>{moment().format("DD/MM/YYYY - HH:mm")}</span>
+                    <div className='flex gap-3 w-full sm:w-[initial]'>
+                      <button className='px-3 py-1 w-full sm:w-[120px] text-allintra-error-500 border border-allintra-error-500 bg-allintra-error-50 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => {
+                        setDrawer(false)
+                        setIsFornecedor([])
+                        reset()
+                      }}>Cancelar</button>
+                      <button type='submit' className='px-3 py-1 w-full sm:w-[120px] text-allintra-primary-800 border border-allintra-primary-800 bg-allintra-primary-50 hover:bg-allintra-primary-500 hover:text-white transition-all  text-sm font-semibold shadow-md rounded-md'>Inserir</button>
+                    </div>
+                  </div>
+                </form>
+
+              </div >
+            </div >
+          </>
+        </Drawer.Content >
+      </Drawer.Root >
+    </div>
   );
 }

@@ -76,11 +76,11 @@ export default function AgendarNovaConsulta({ openAgenda, closeAgenda }: any) {
         }
       }).then(e => setCidadao(e.data)).catch(e => console.log(e))
 
-      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
+      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/v2/user`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
-      }).then(e => setColaborador(e.data)).catch(e => console.log(e))
+      }).then(e => setColaborador(e.data.items)).catch(e => console.log(e))
     }
     // Verifica se está no lado do cliente
     getCookie()
@@ -133,7 +133,7 @@ export default function AgendarNovaConsulta({ openAgenda, closeAgenda }: any) {
                       <select {...register('idTecResponsavel')} name="idTecResponsavel" id="idTecResponsavel" className={`shadow-md block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white`}>
                         <option value="">Selecione um colaborador</option>
                         {
-                          colaborador.map((item: any, index: any) => <option value={item.id} key={index}>{item.name}</option>)
+                          colaborador.map((item: any, index: any) => <option value={item.id} key={index}>{item.email}</option>)
                         }
                       </select>
                       {
