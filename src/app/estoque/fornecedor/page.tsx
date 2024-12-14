@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BsFillTelephoneFill } from "react-icons/bs";
 import { FaLink, FaWhatsapp } from "react-icons/fa";
-import { IoIosInformationCircleOutline, IoMdAddCircleOutline, IoMdPrint } from "react-icons/io";
+import { IoMdAddCircleOutline, IoMdCheckmark, IoMdPrint } from "react-icons/io";
 import { MdDelete, MdModeEditOutline } from "react-icons/md";
 import { toast } from "react-toastify";
 
@@ -43,6 +43,8 @@ export default function Fornecedor() {
   const token = Cookie.get('accessToken')
   const [fornecedores, setFornecedores] = useState([]);
   const [drawer, setDrawer] = useState(false);
+  const [drawerDetails, setDrawerDetails] = useState(false);
+  const [DFornecedor, setDFornecedor] = useState<any>([]);
   const [isFornecedor, setIsFornecedor] = useState<any>([]);
   const { register, handleSubmit, control, reset, formState: { errors, isSubmitting } } = useForm()
   var isFornecedorTrue = isFornecedor.length
@@ -87,6 +89,18 @@ export default function Fornecedor() {
       </div>
     </div>
   );
+
+  const detalhesConsulta = async (DFornecedor: any) => {
+    setDrawerDetails(true)
+    setDFornecedor(DFornecedor)
+    // await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/consulta/${detalheconsulta.id}`, {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`
+    //   }
+    // }).then(e => {
+    //   setMedicamentos(e.data.medicamentos)
+    // }).catch(e => console.log(e))
+  }
 
   const inserirFirm = async (data: any) => {
     const firm = {
@@ -192,7 +206,7 @@ export default function Fornecedor() {
                         fornecedores && Array.isArray(fornecedores) ? fornecedores?.map((item: any, index: any) => {
                           moment.locale('pt')
                           return (
-                            <tr key={index} className={`animate-fadeIn group/item border-b border-slate-300 last:border-0 hover:bg-cyan-50 transition-all cursor-pointer`} onClick={() => console.log(item)}>
+                            <tr key={index} className={`animate-fadeIn group/item border-b border-slate-300 last:border-0 hover:bg-cyan-50 transition-all cursor-pointer`} onClick={() => detalhesConsulta(item)}>
                               <td className="px-3 py-3 group-hover/item:underline group-hover/item:text-cyan-500 text-nowrap truncate max-w-[200px]">{item.businessName}</td>
                               <td className="px-3 py-3 text-left group-hover/item:underline group-hover/item:text-cyan-500 text-nowrap truncate max-w-[120px]">{item.cnpj}</td>
                               <th className="py-3 text-left max-w-44 truncate cursor-pointer">{item.email || "-"}</th>
@@ -230,7 +244,7 @@ export default function Fornecedor() {
         </div>
       </div>
 
-      {/* Drawer Inserir Consulta */}
+      {/* Drawer Inserir Fornecedor */}
       <Drawer.Root open={drawer == true} onOpenChange={() => setDrawer(false)} >
         <Drawer.Content className="2xl:w-[85%]">
           <>
@@ -440,6 +454,75 @@ export default function Fornecedor() {
             </div >
           </>
         </Drawer.Content >
+      </Drawer.Root >
+      {/* Drawer Detalhes do Fornecedor */}
+      <Drawer.Root open={drawerDetails == true} onOpenChange={() => setDrawerDetails(false)}>
+        <Drawer.Content className="2xl:w-[85%]">
+          <DialogTitle>
+            <BoxInfo.Root type={`success`} className='mb-3'>
+              <BoxInfo.Icon icon={IoMdCheckmark} type={'success'} />
+              <BoxInfo.Message>Fornecedor encontra-se ativo</BoxInfo.Message>
+            </BoxInfo.Root>
+          </DialogTitle>
+
+          <div className='shadow-md bg-white rounded-md overflow-auto border mb-3 h-[88%] flex flex-col justify-between relative'>
+            <div>
+              <div className='flex justify-between items-center p-4 sticky top-0 bg-allintra-white-50 shadow-sm z-10'>
+                <h2 className='font-semibold text-allintra-gray-700'>Consulta inserida</h2>
+                <div className='flex gap-3 items-center'>
+                  <button className={`rounded p-2 shadow-sm border text-allintra-gray-700 hover:bg-allintra-gray-300`}>
+                    <MdModeEditOutline />
+                  </button>
+                  <button className={`rounded p-2 shadow-sm border text-allintra-gray-700 hover:bg-allintra-gray-300`}>
+                    <IoMdPrint />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap w-full my-0 p-4">
+                <div className="w-full md:w-1/2 px-3 my-2">
+                  <span className='text-allintra-gray-700 text-sm'>Fornecedor / Razão Social</span>
+                  <div className='text-gray-800'>
+                    <span>{DFornecedor?.businessName}</span>
+                  </div>
+                </div>
+                <div className="w-full md:w-1/2 px-3 my-2">
+                  <span className='text-allintra-gray-700 text-sm'>Telefone / Contato</span>
+                  <div className='text-gray-800'>
+                    <span>{DFornecedor?.phone}</span>
+                  </div>
+                </div>
+                <div className="w-full md:w-1/2 px-3 my-2">
+                  <span className='text-allintra-gray-700 text-sm'>Responsável Técnico</span>
+                  <div className='text-gray-800 flex flex-col'>
+                    <span>{DFornecedor?.email}</span>
+                  </div>
+                </div>
+                <div className="w-full md:w-1/2 px-3 my-2">
+                  <span className='text-allintra-gray-700 text-sm'>CNPJ</span>
+                  <div className='text-gray-800 flex flex-col'>
+                    <span>{DFornecedor?.cnpj}</span>
+                  </div>
+                </div>
+
+                <div className="w-full p-3 my-2 border-t">
+                  <span className="text-allintra-gray-700 text-sm"><span className="text-lg font-medium text-allintra-gray-600">Endereço</span> <br />Fornecedor / Empresa</span>
+                  <div className="border shadow-sm p-5 text-gray-800 animate-scaleIn rounded bg-allintra-gray-300 hover:border-allintra-primary-500 w-full break-words whitespace-pre-line">
+                    {DFornecedor?.descricao}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className='flex justify-between items-center w-full gap-3 bg-allintra-gray-300 px-4 py-4 sticky bottom-0 left-0'>
+              {/* <span className='text-allintra-gray-500 text-sm truncate w-full hidden sm:flex'>{isFornecedor?.id}</span>
+              <div className='flex gap-3 w-full sm:w-[initial]'>
+                <button className='px-3 py-1 w-full sm:w-[120px] text-allintra-error-50 bg-red-400 hover:bg-red-300 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => alert(isFornecedor?.id)}>Deletar</button>
+                <button className='px-3 py-1 w-full sm:w-[120px] text-allintra-attention-50 bg-orange-400 hover:bg-orange-300 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => alert('Editar Consulta')}>Remarcar</button>
+              </div> */}
+            </div>
+          </div>
+        </Drawer.Content>
       </Drawer.Root >
     </div>
   );
