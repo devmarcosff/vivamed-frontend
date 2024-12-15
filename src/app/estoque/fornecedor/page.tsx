@@ -6,7 +6,7 @@ import { Drawer } from "@/components/stylesComponents/organisms/Drawer";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import axios from "axios";
 import Cookie from 'js-cookie';
-import { Plus } from "lucide-react";
+import { Hospital, Plus } from "lucide-react";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -78,9 +78,9 @@ export default function Fornecedor() {
           <p className="mt-1 text-sm text-allintra-gray-700">{description}</p>
         </div>
         <div>
-          <button type="submit" onClick={() => setDrawer(true)} className="flex w-full group/firm sm:w-36 justify-center items-center rounded-xl bg-cyan-800 transition-all px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3">
+          <button type="submit" onClick={() => setDrawer(true)} className="flex w-full gap-3 group/firm sm:w-36 justify-center items-center rounded-xl bg-cyan-800 transition-all px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 sm:ml-3">
+            <Hospital className="h-4 w-4 transition-all" />
             Fornecedor
-            <Plus className="ml-2 h-4 w-4 transition-all group-hover/firm:rotate-90" />
           </button>
         </div>
       </div>
@@ -506,7 +506,7 @@ export default function Fornecedor() {
                 </div>
 
                 <div className="w-full p-3 my-2 border-t">
-                  <span className="text-allintra-gray-700 text-sm"><span className="text-lg font-medium text-allintra-gray-600">Endereço</span> <br />Fornecedor / Empresa</span>
+                  <span className="text-allintra-gray-700 text-sm"><span className="font-medium text-allintra-gray-600">Endereço</span></span>
                   <div className="border shadow-sm p-5 text-gray-800 animate-scaleIn rounded bg-allintra-gray-300 hover:border-allintra-primary-500 w-full break-words whitespace-pre-line">
                     {DFornecedor?.descricao}
                   </div>
