@@ -21,7 +21,7 @@ export default function CadastrarNotaFiscal({ openModal, closeModal }: any) {
   const token = Cookie.get('accessToken');
   const [consulta, setConsulta] = useState<any>()
   const [medicamento, setMedicamento] = useState<any>(false)
-  const [cidadao, setCidadao] = useState<any>([])
+  const [receipts, setReceipts] = useState<any>([])
   const [user, setUser] = useState<CadastroCidadao | undefined>()
   const [loading, setLoading] = useState(false);
 
@@ -44,9 +44,7 @@ export default function CadastrarNotaFiscal({ openModal, closeModal }: any) {
         'Authorization': `Bearer ${token}`
       },
     }).then(() => {
-      setLoading(true)
       reset()
-      closeModal(false)
       toast.success("Medicamento inserido com sucesso.", {
         position: "bottom-right",
         autoClose: 5000,
@@ -57,24 +55,8 @@ export default function CadastrarNotaFiscal({ openModal, closeModal }: any) {
         progress: undefined,
         theme: "light",
       });
-      // setTimeout(() => {
-      //   setMedicamento(!medicamento)
-      //   setConsulta(!consulta)
-      //   toast.success("Medicamento inserido com sucesso.", {
-      //     position: "bottom-right",
-      //     autoClose: 5000,
-      //     hideProgressBar: false,
-      //     closeOnClick: true,
-      //     pauseOnHover: true,
-      //     draggable: true,
-      //     progress: undefined,
-      //     theme: "light",
-      //   });
-      // }, 1000);
     }).catch(e => {
-      setLoading(true)
-      console.log(e.data)
-      toast.error("Erro ao adicionar medicamento.", {
+      toast.error(`${e.response.data.message}`, {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -85,63 +67,17 @@ export default function CadastrarNotaFiscal({ openModal, closeModal }: any) {
         theme: "light",
       })
     }).finally(() => {
-      setLoading(false)
-    })
-  }
-
-  const createCidadao = async (data: any) => {
-    var consulta = {
-      "prontuario": data.prontuario,
-      "respTec": user?.id,
-      "role": data.role,
-      "idProf": data.idProf,
-      "descricao": data.descricao
-    }
-
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/consulta`, consulta, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-    }).then(e => {
-      // setLoading(true)
-      // setTimeout(() => {
-      setConsulta(e.data)
-      toast.success("Consulta inserida com sucesso.", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      // }, 1000);
-    }).catch(e => {
-      // setLoading(true)
-      // setTimeout(() => {
-      toast.error("Erro ao adicionar consulta.", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      // }, 1000);
+      closeModal(false)
     })
   }
 
   useEffect(() => {
     const fetchData = async () => {
-      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cidadao`, {
+      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/v2/receipts`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
-      }).then(e => setCidadao(e.data)).catch(e => console.log(e))
+      }).then(e => setReceipts(e.data)).catch(e => console.log(e))
     }
     // Verifica se está no lado do cliente
     getCookie()
@@ -173,7 +109,7 @@ export default function CadastrarNotaFiscal({ openModal, closeModal }: any) {
               </div>
               <div className="p-3">
                 <form className="w-full" onSubmit={handleSubmit(createMedicamento)}>
-                  <h2 className='font-bold text-left'>Preencha as Informações da consulta</h2>
+                  <h2 className='font-bold text-left'>Preencha as Informações do medicamento</h2>
                   <div className="flex flex-wrap -mx-3 my-3 text-left">
                     <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                       <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="name">
@@ -220,15 +156,6 @@ export default function CadastrarNotaFiscal({ openModal, closeModal }: any) {
                         errors.concentration && <p className="text-red-500 text-xs italic">Por favor, preencha este campo.</p>
                       }
                     </div>
-                    {/* <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="healthRegistration">
-                        healthRegistration *
-                      </label>
-                      <input {...register('name')}  placeholder='Nome do medicamento' className={`${errors.name && 'border-red-500'} appearance-none shadow-sm block my-4 w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} id="healthRegistration" type="text" />
-                      {
-                        errors.name && <p className="text-red-500 text-xs italic">Por favor, preencha este campo.</p>
-                      }
-                    </div> */}
                     <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                       <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="manufacturer">
                         Fabricante *
