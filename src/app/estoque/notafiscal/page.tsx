@@ -236,216 +236,163 @@ export default function NotaFiscal() {
       </div>
 
       {/* Drawer Inserir Notal Fiscal */}
-      <Drawer.Root open={drawer == true} onOpenChange={() => setDrawer(false)} >
+      <Drawer.Root open={drawer} onOpenChange={() => setDrawer(false)}>
         <Drawer.Content className="2xl:w-[85%]">
-          <>
-            <div className='shadow-md bg-white rounded-md overflow-auto border mb-3 flex flex-col justify-between relative'>
-              <div>
-                <div className='flex justify-between items-center p-4 sticky top-0 bg-allintra-white-50 shadow-sm'>
-                  <h2 className='font-semibold text-allintra-gray-700'>Preencha os dados da nota fiscal</h2>
-                </div>
+          <div className='shadow-md bg-white rounded-md overflow-auto border mb-3 flex flex-col justify-between relative'>
+            <div>
+              <div className='flex justify-between items-center p-4 sticky top-0 bg-allintra-white-50 shadow-sm'>
+                <h2 className='font-semibold text-allintra-gray-700'>Cadastro de Nota Fiscal</h2>
+              </div>
 
-                <form className="w-full"
-                  onSubmit={handleSubmit(handleReceipt)}
-                >
-                  <div className="flex flex-wrap p-5 text-left justify-between">
-                    <div className="w-full md:w-1/2 px-3 mb-6 md:mb-3">
-                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="businessName">
-                        Nome da Empresa / Razão Social*
-                      </label>
-                      <input {...register('businessName')} id="businessName" placeholder="Stevanini LTDA" className={`shadow-sm block w-full bg-white text-gray-700 border rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} type="text" />
-                      {
-                        errors.businessName && <p className="text-red-500 text-xs italic">Por favor selecione um colaborador</p>
-                      }
-                    </div>
-                    <div className="w-full md:w-1/2 px-3 mb-6 md:mb-3">
-                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                        CNPJ*
-                      </label>
-                      <input {...register('cnpj')} id="cnpj" placeholder="XX.XXX.XXX/0001-XX" className={`shadow-sm block w-full bg-white text-gray-700 border rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} type="text" />
-                      {
-                        errors.paciente && <p className="text-red-500 text-xs italic">Por favor selecione um colaborador</p>
-                      }
-                    </div>
-                    <div className="w-full md:w-1/2 px-3 mb-6 md:mb-3">
-                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                        Email*
-                      </label>
-                      <input {...register('email')} id="email" placeholder="email@email.com" className={`shadow-sm block w-full bg-white text-gray-700 border rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} type="text" />
-                      {
-                        errors.paciente && <p className="text-red-500 text-xs italic">Por favor selecione um colaborador</p>
-                      }
-                    </div>
-                    <div className="w-full md:w-1/2 px-3 mb-6 md:mb-3">
-                      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="prontuario">
-                        Telefone*
-                      </label>
-                      <input {...register('phone')} id="phone" placeholder="(00) 00000-0000" className={`shadow-sm block w-full bg-white text-gray-700 border rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`} type="text" />
-                      {
-                        errors.paciente && <p className="text-red-500 text-xs italic">Por favor selecione um colaborador</p>
-                      }
-                    </div>
+              <form
+                className="w-full"
+              // onSubmit={handleSubmit(handleInvoiceSubmit)}
+              >
+                <div className="flex flex-wrap p-5 text-left justify-between">
+                  {/* Invoice Header Information */}
+                  <div className="w-full md:w-1/2 px-3 mb-6 md:mb-3">
+                    <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="invoiceNumber">
+                      Número da Nota Fiscal*
+                    </label>
+                    <input
+                      {...register('invoiceNumber', { required: true })}
+                      id="invoiceNumber"
+                      placeholder="000.000"
+                      className={`shadow-sm block w-full bg-white text-gray-700 border rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`}
+                      type="text"
+                    />
+                    {errors.invoiceNumber && <p className="text-red-500 text-xs italic">Por favor, insira o número da nota fiscal</p>}
+                  </div>
 
-                    {/* ADICIONAR MEDICAMENTOS */}
-                    {!isFornecedorTrue && (
-                      <div className="w-full px-3 mb-3 py-3 border-t md:mb-0">
-                        <button type="button" onClick={adicionarMedicamento}>
-                          <span className='flex gap-2 items-center text-allintra-gray-700 font-semibold'><IoMdAddCircleOutline /> Adicionar endereço</span>
+                  <div className="w-full md:w-1/2 px-3 mb-6 md:mb-3">
+                    <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="invoiceDate">
+                      Data da Emissão*
+                    </label>
+                    <input
+                      {...register('invoiceDate', { required: true })}
+                      id="invoiceDate"
+                      type="date"
+                      className={`shadow-sm block w-full bg-white text-gray-700 border rounded py-2 px-4 leading-tight focus:outline-none focus:border-allintra-primary-500`}
+                    />
+                    {errors.invoiceDate && <p className="text-red-500 text-xs italic">Por favor, selecione a data</p>}
+                  </div>
+
+                  {/* Invoice Items Section */}
+                  <div className="w-full px-3 mb-3 py-3 border-t md:mb-0">
+                    <button type="button">
+                      <span className='flex gap-2 items-center text-allintra-gray-700 font-semibold'>
+                        <IoMdAddCircleOutline /> Adicionar Item
+                      </span>
+                    </button>
+                  </div>
+
+                  {receipts.map((item, index) => (
+                    <div className='w-full flex flex-wrap my-4 relative' key={index}>
+                      <div className="w-full sm:w-1/3 px-3 py-3 border-t md:mb-0">
+                        <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor={`itemDescription-${index}`}>
+                          Descrição do Item*
+                        </label>
+                        <input
+                          {...register(`items.${index}.description`, { required: true })}
+                          type='text'
+                          placeholder='Descrição do item'
+                          id={`itemDescription-${index}`}
+                          className={`appearance-none shadow-sm block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
+                        />
+                      </div>
+
+                      <div className="w-full sm:w-1/3 px-3 py-3 border-t md:mb-0">
+                        <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor={`itemQuantity-${index}`}>
+                          Quantidade*
+                        </label>
+                        <input
+                          {...register(`items.${index}.quantity`, { required: true, min: 1 })}
+                          type='number'
+                          placeholder='0'
+                          id={`itemQuantity-${index}`}
+                          className={`appearance-none shadow-sm block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
+                        />
+                      </div>
+
+                      <div className="w-full sm:w-1/3 px-3 py-3 border-t md:mb-0">
+                        <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor={`itemValue-${index}`}>
+                          Valor Unitário*
+                        </label>
+                        <input
+                          {...register(`items.${index}.unitValue`, { required: true, min: 0 })}
+                          type='number'
+                          step='0.01'
+                          placeholder='R$ 0,00'
+                          id={`itemValue-${index}`}
+                          className={`appearance-none shadow-sm block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`}
+                        />
+                      </div>
+
+                      <div className="w-full px-3 md:mb-0 py-1">
+                        <button
+                          type="button"
+                          // onClick={() => removeInvoiceItem(index)}
+                          className="
+                          absolute top-2 right-3 p-1
+                          text-allintra-error-500 border border-allintra-error-500 bg-allintra-error-50 hover:bg-allintra-error-500 hover:text-white transition-all text-sm font-semibold shadow-sm rounded"
+                        >
+                          <MdDelete />
                         </button>
                       </div>
-                    )}
-                    {isFornecedor?.map((item: any, index: any) => (
-                      <div className='w-full flex flex-wrap my-4 relative' key={index}>
-                        <div className="w-full sm:w-1/2 px-3 py-3 border-t md:mb-0">
-                          <div>
-                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="street">
-                              Rua / Logadouro
-                            </label>
-                            <input
-                              // onChange={e => handleInputChange(index, 'street', e.target.value)}
-                              type='text'
-                              placeholder='Rua da empresa'
-                              {...register('street')}
-                              id="street"
-                              name="street"
-                              className={`${errors.street && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
-                            {
-                              errors.street && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                            }
-                          </div>
-                        </div>
-                        <div className="w-full sm:w-1/2 px-3 py-3 border-t md:mb-0">
-                          <div>
-                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="city">
-                              Cidade
-                            </label>
-                            <input
-                              // onChange={e => handleInputChange(index, 'cidade', e.target.value)}
-                              type='text'
-                              placeholder='Cidade da empresa'
-                              {...register('city')}
-                              id="city"
-                              name="city"
-                              className={`${errors.city && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
-                            {
-                              errors.city && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                            }
-                          </div>
-                        </div>
-                        <div className="w-full sm:w-1/2 px-3 py-3 border-t md:mb-0">
-                          <div>
-                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="neighborhood">
-                              Bairro
-                            </label>
-                            <input
-                              // onChange={e => handleInputChange(index, 'cidade', e.target.value)}
-                              type='text'
-                              placeholder='Cidade da empresa'
-                              {...register('neighborhood')}
-                              id="neighborhood"
-                              name="neighborhood"
-                              className={`${errors.neighborhood && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
-                            {
-                              errors.neighborhood && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                            }
-                          </div>
-                        </div>
-                        <div className="w-full sm:w-1/2 px-3 py-3 md:mb-0">
-                          <div>
-                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="number">
-                              Número
-                            </label>
-                            <input
-                              // onChange={e => handleInputChange(index, 'number', e.target.value)}
-                              type='text'
-                              placeholder='60'
-                              {...register('number')}
-                              id="number"
-                              name="number"
-                              className={`${errors.number && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
-                            {
-                              errors.number && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                            }
-                          </div>
-                        </div>
-                        <div className="w-full sm:w-1/2 px-3 py-3 md:mb-0">
-                          <div>
-                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="zipcode">
-                              CEP
-                            </label>
-                            <input
-                              // onChange={e => handleInputChange(index, 'zipcode', e.target.value)}
-                              type='text'
-                              placeholder='28360-000'
-                              {...register('zipcode')}
-                              id="zipcode"
-                              name="zipcode"
-                              className={`${errors.zipcode && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
-                            {
-                              errors.zipcode && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                            }
-                          </div>
-                        </div>
-                        <div className="w-full sm:w-1/2 px-3 py-3 md:mb-0">
-                          <div>
-                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="state">
-                              UF
-                            </label>
-                            <input
-                              // onChange={e => handleInputChange(index, 'state', e.target.value)}
-                              type='text'
-                              placeholder='Estado da empresa'
-                              {...register('state')}
-                              id="state"
-                              name="state"
-                              className={`${errors.state && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
-                            {
-                              errors.state && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                            }
-                          </div>
-                        </div>
-                        <div className="w-full px-3 py-3 md:mb-0">
-                          <div>
-                            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="complement">
-                              Complemento
-                            </label>
-                            <textarea id="complement" {...register('complement')} className={`${errors.complement && 'border-red-500'} appearance-none shadow-sm block w-full  text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-allintra-primary-500`} />
-                            {
-                              errors.complement && <p className="text-red-500 text-xs italic">Por favor preencha este campo.</p>
-                            }
-                          </div>
-                        </div>
-                        <div className="w-full px-3 md:mb-0 py-1">
-                          <button
-                            type="button"
-                            onClick={() => removerMedicamento(index)}
-                            className="
-                                  absolute top-2 right-3 p-1
-                                  text-allintra-error-500 border border-allintra-error-500 bg-allintra-error-50 hover:bg-allintra-error-500 hover:text-white transition-all text-sm font-semibold shadow-sm rounded"
-                          ><MdDelete /></button>
-                        </div>
-                      </div>
-                    ))}
-
-                  </div>
-                  <div className='flex sm:flex-row sm:justify-between flex-col-reverse justify-end items-center w-full gap-3 bg-allintra-gray-300 px-4 py-2 sticky bottom-0 left-0'>
-                    <span className='text-allintra-gray-600 text-sm truncate w-full hidden sm:flex'>{moment().format("DD/MM/YYYY - HH:mm")}</span>
-                    <div className='flex gap-3 w-full sm:w-[initial]'>
-                      <button className='px-3 py-1 w-full sm:w-[120px] text-allintra-error-500 border border-allintra-error-500 bg-allintra-error-50 transition-all text-sm font-semibold shadow-md rounded-md' onClick={() => {
-                        setDrawer(false)
-                        setIsFornecedor([])
-                        reset()
-                      }}>Cancelar</button>
-                      <button type='submit' className='px-3 py-1 w-full sm:w-[120px] text-allintra-primary-800 border border-allintra-primary-800 bg-allintra-primary-50 hover:bg-allintra-primary-500 hover:text-white transition-all  text-sm font-semibold shadow-md rounded-md'>Inserir</button>
                     </div>
-                  </div>
-                </form>
+                  ))}
 
-              </div >
-            </div >
-          </>
+                  {/* Total Invoice Value */}
+                  <div className="w-full px-3 mb-6 md:mb-3">
+                    <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="totalValue">
+                      Valor Total da Nota
+                    </label>
+                    <input
+                      {...register('totalValue')}
+                      id="totalValue"
+                      placeholder="R$ 0,00"
+                      readOnly
+                      // value={invoiceItems.reduce((total, item) => {
+                      //   const quantity = item.quantity || 0;
+                      //   const unitValue = item.unitValue || 0;
+                      //   return total + (quantity * unitValue);
+                      // }, 0).toFixed(2)}
+                      className={`shadow-sm block w-full bg-gray-100 text-gray-700 border rounded py-2 px-4 leading-tight`}
+                      type="text"
+                    />
+                  </div>
+                </div>
+
+                <div className='flex sm:flex-row sm:justify-between flex-col-reverse justify-end items-center w-full gap-3 bg-allintra-gray-300 px-4 py-2 sticky bottom-0 left-0'>
+                  <span className='text-allintra-gray-600 text-sm truncate w-full hidden sm:flex'>
+                    {moment().format("DD/MM/YYYY - HH:mm")}
+                  </span>
+                  <div className='flex gap-3 w-full sm:w-[initial]'>
+                    <button
+                      type="button"
+                      className='px-3 py-1 w-full sm:w-[120px] text-allintra-error-500 border border-allintra-error-500 bg-allintra-error-50 transition-all text-sm font-semibold shadow-md rounded-md'
+                      onClick={() => {
+                        setDrawer(false);
+                        // setInvoiceItems([]);
+                        reset();
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type='submit'
+                      className='px-3 py-1 w-full sm:w-[120px] text-allintra-primary-800 border border-allintra-primary-800 bg-allintra-primary-50 hover:bg-allintra-primary-500 hover:text-white transition-all text-sm font-semibold shadow-md rounded-md'
+                    >
+                      Inserir
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
         </Drawer.Content>
       </Drawer.Root>
+
       {/* Drawer Detalhes do Fornecedor */}
       <Drawer.Root open={drawerDetails == true} onOpenChange={() => setDrawerDetails(false)}>
         <Drawer.Content className="2xl:w-[85%]">
